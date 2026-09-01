@@ -1,0 +1,23 @@
+-- SQL Migration: Prevent duplicate handover form numbers
+-- Run this AFTER cleaning existing duplicates (see cleanup query below).
+--
+-- Cleanup existing duplicates first (keeps the approved row, otherwise the latest):
+--   WITH ranked AS (
+--     SELECT id, status,
+--            ROW_NUMBER() OVER (
+--              PARTITION BY form_number
+--              ORDER BY (status = 'approved') DESC, created_at DESC
+--            ) AS rn
+--     FROM handovers
+--   )
+--   DELETE FROM handovers WHERE id IN (SELECT id FROM ranked WHERE rn > 1);
+--
+-- Diagnose duplicates / triggers:
+--   SELECT form_number, COUNT(*), string_agg(status, ', '), string_agg(id::text, ', ')
+--   FROM handovers GROUP BY form_number HAVING COUNT(*) > 1;
+--
+--   SELECT trigger_name, event_manipulation
+--   FROM information_schema.triggers
+--   WHERE event_object_table = 'handovers' AND trigger_schema = 'public';
+
+CREATE UNIQUE INDEX IF NOT EXISTS handovers_form_number_unique ON public.handovers (form_number);
