@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Plus, Trash2, Save, Send, Loader2, CheckSquare, Layers, AlertCircle } from "lucide-react"
+import { ResponsiveScale } from "@/components/responsive-scale"
 import {
   DEFAULT_SAFETY_TOOLS,
   DEFAULT_CRITICAL_EQUIPMENT,
@@ -320,11 +321,11 @@ export default function HandoverFormPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-12">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 max-w-5xl mx-auto pb-12 px-2 sm:px-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Formulir Serah Terima Shift</h1>
-          <p className="text-muted-foreground mt-1">Lengkapi log aktifitas dan data operasional shift</p>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Formulir Serah Terima Shift</h1>
+          <p className="text-muted-foreground mt-1 text-sm">Lengkapi log aktifitas dan data operasional shift</p>
         </div>
       </div>
 
@@ -342,6 +343,7 @@ export default function HandoverFormPage() {
         </div>
       )}
 
+      <ResponsiveScale baseWidth={800}>
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -399,7 +401,7 @@ export default function HandoverFormPage() {
               {activities.map((activity, index) => (
                 <div key={index} className="space-y-1.5 p-3 rounded-lg border bg-muted/10">
                   <div className="flex gap-2 items-start">
-                    <div className="w-20 shrink-0">
+                    <div className="w-16 sm:w-20 shrink-0">
                       <Input
                         placeholder="16:01"
                         value={activity.waktu}
@@ -407,7 +409,7 @@ export default function HandoverFormPage() {
                         className="h-8 text-xs"
                       />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <Input
                         placeholder="Nama Aktivitas / Bab"
                         value={activity.aktivitas}
@@ -428,9 +430,9 @@ export default function HandoverFormPage() {
                   </div>
 
                   {activity.subs.map((sub, subIdx) => (
-                    <div key={subIdx} className="flex gap-2 items-start pl-10">
+                    <div key={subIdx} className="flex gap-2 items-start pl-6 sm:pl-10">
                       <span className="text-xs text-muted-foreground pt-2 w-3">-</span>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <Input
                           placeholder="Detail sub aktivitas"
                           value={sub}
@@ -450,7 +452,7 @@ export default function HandoverFormPage() {
                     </div>
                   ))}
 
-                  <div className="flex gap-2 pl-7">
+                  <div className="flex gap-2 pl-5 sm:pl-7">
                     <Button
                       type="button"
                       variant="ghost"
@@ -766,24 +768,24 @@ export default function HandoverFormPage() {
         {/* Team Sign-off */}
         <Card className="p-6 space-y-4">
           <h2 className="text-lg font-semibold">Tim Serah Terima</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div className="space-y-3">
               <h3 className="font-medium text-sm bg-primary/5 px-3 py-1.5 rounded text-center">Yang Menyerahkan</h3>
               <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Label className="text-xs w-24">Pws / Danru Shift</Label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                  <Label className="text-xs sm:w-24">Pws / Danru Shift</Label>
                   <Input className="h-8 text-xs" value={teams.yangMenyerahkan.danru} onChange={(e) => setTeams({...teams, yangMenyerahkan: {...teams.yangMenyerahkan, danru: e.target.value}})} />
                 </div>
-                <div className="flex items-center gap-2">
-                  <Label className="text-xs w-24">Anggota 1</Label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                  <Label className="text-xs sm:w-24">Anggota 1</Label>
                   <Input className="h-8 text-xs" value={teams.yangMenyerahkan.anggota1} onChange={(e) => setTeams({...teams, yangMenyerahkan: {...teams.yangMenyerahkan, anggota1: e.target.value}})} />
                 </div>
-                <div className="flex items-center gap-2">
-                  <Label className="text-xs w-24">Anggota 2</Label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                  <Label className="text-xs sm:w-24">Anggota 2</Label>
                   <Input className="h-8 text-xs" value={teams.yangMenyerahkan.anggota2} onChange={(e) => setTeams({...teams, yangMenyerahkan: {...teams.yangMenyerahkan, anggota2: e.target.value}})} />
                 </div>
-                <div className="flex items-center gap-2">
-                  <Label className="text-xs w-24">Anggota 3</Label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                  <Label className="text-xs sm:w-24">Anggota 3</Label>
                   <Input className="h-8 text-xs" value={teams.yangMenyerahkan.anggota3} onChange={(e) => setTeams({...teams, yangMenyerahkan: {...teams.yangMenyerahkan, anggota3: e.target.value}})} />
                 </div>
               </div>
@@ -791,20 +793,20 @@ export default function HandoverFormPage() {
             <div className="space-y-3">
               <h3 className="font-medium text-sm bg-primary/5 px-3 py-1.5 rounded text-center">Yang Menerima</h3>
               <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Label className="text-xs w-24">Pws / Danru Shift</Label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                  <Label className="text-xs sm:w-24">Pws / Danru Shift</Label>
                   <Input className="h-8 text-xs" value={teams.yangMenerima.danru} onChange={(e) => setTeams({...teams, yangMenerima: {...teams.yangMenerima, danru: e.target.value}})} />
                 </div>
-                <div className="flex items-center gap-2">
-                  <Label className="text-xs w-24">Anggota 1</Label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                  <Label className="text-xs sm:w-24">Anggota 1</Label>
                   <Input className="h-8 text-xs" value={teams.yangMenerima.anggota1} onChange={(e) => setTeams({...teams, yangMenerima: {...teams.yangMenerima, anggota1: e.target.value}})} />
                 </div>
-                <div className="flex items-center gap-2">
-                  <Label className="text-xs w-24">Anggota 2</Label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                  <Label className="text-xs sm:w-24">Anggota 2</Label>
                   <Input className="h-8 text-xs" value={teams.yangMenerima.anggota2} onChange={(e) => setTeams({...teams, yangMenerima: {...teams.yangMenerima, anggota2: e.target.value}})} />
                 </div>
-                <div className="flex items-center gap-2">
-                  <Label className="text-xs w-24">Anggota 3</Label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                  <Label className="text-xs sm:w-24">Anggota 3</Label>
                   <Input className="h-8 text-xs" value={teams.yangMenerima.anggota3} onChange={(e) => setTeams({...teams, yangMenerima: {...teams.yangMenerima, anggota3: e.target.value}})} />
                 </div>
               </div>
@@ -813,12 +815,12 @@ export default function HandoverFormPage() {
           <div className="border-t pt-3 mt-3">
             <p className="font-medium text-sm mb-3 text-center">Mengetahui</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="flex items-center gap-2">
-                <Label className="text-xs w-28 shrink-0">Danru</Label>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                <Label className="text-xs sm:w-28 shrink-0">Danru</Label>
                 <Input className="h-8 text-xs flex-1" readOnly value={teams.yangMenyerahkan.danru} />
               </div>
-              <div className="flex items-center gap-2">
-                <Label className="text-xs w-28 shrink-0">Sr. Spv II Fuel & LPG RSD</Label>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                <Label className="text-xs sm:w-28 shrink-0">Sr. Spv II Fuel & LPG RSD</Label>
                 <Input className="h-8 text-xs flex-1" value={teams.mengetahui.spv} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, spv: e.target.value}})} placeholder="Nama" />
               </div>
             </div>
@@ -826,12 +828,12 @@ export default function HandoverFormPage() {
         </Card>
 
         {/* Form Action Buttons */}
-        <div className="flex items-center justify-end gap-4 pt-4">
-          <Button type="button" variant="outline" onClick={() => handleSubmit("draft")} disabled={submitting}>
+        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4">
+          <Button type="button" variant="outline" onClick={() => handleSubmit("draft")} disabled={submitting} className="w-full sm:w-auto">
             <Save className="h-4 w-4 mr-2" />
             Simpan Draft
           </Button>
-          <Button type="submit" disabled={submitting || !!pendingHandover} title={pendingHandover ? "Tunggu persetujuan supervisor untuk laporan sebelumnya" : undefined}>
+          <Button type="submit" disabled={submitting || !!pendingHandover} title={pendingHandover ? "Tunggu persetujuan supervisor untuk laporan sebelumnya" : undefined} className="w-full sm:w-auto">
             {submitting ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -846,6 +848,7 @@ export default function HandoverFormPage() {
           </Button>
         </div>
       </form>
+      </ResponsiveScale>
     </div>
   )
 }

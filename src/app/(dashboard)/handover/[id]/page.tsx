@@ -10,6 +10,7 @@ import { useToast } from "@/contexts/toast-context"
 import { useConfirm } from "@/contexts/confirm-context"
 import { useUser } from "@/contexts/user-context"
 import { ShiftHandoverDocument } from "@/components/handover/shift-handover-document"
+import { ResponsiveScale } from "@/components/responsive-scale"
 
 export default function HandoverDetailPage() {
   const params = useParams()
@@ -126,25 +127,26 @@ export default function HandoverDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="outline" size="icon" onClick={() => router.push("/dashboard")}>
+    <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+        <Button variant="outline" size="icon" onClick={() => router.push("/dashboard")} className="shrink-0 self-start">
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight">{String(handover.form_number || "")}</h1>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-lg sm:text-2xl font-bold tracking-tight truncate">{String(handover.form_number || "")}</h1>
             <Badge className={getStatusBadge(String(handover.status || ""))}>{String(handover.status)}</Badge>
           </div>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 text-sm">
             {String((handover.shifts as Record<string, unknown> | null)?.name || "")} &middot;{" "}
             {new Date(String(handover.tanggal || "")).toLocaleDateString()}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap shrink-0">
           <Button variant="outline" size="sm" onClick={() => router.push(`/handover/${params.id}/print`)}>
             <Printer className="h-4 w-4 mr-1" />
-            Cetak PDF
+            <span className="hidden sm:inline">Cetak PDF</span>
+            <span className="sm:hidden">Cetak</span>
           </Button>
           {handover && String(handover.status || "") === "draft" && (
             <Button size="sm" onClick={() => router.push(`/handover/${params.id}/edit`)}>
@@ -171,8 +173,10 @@ export default function HandoverDetailPage() {
         </div>
       </div>
 
-      <div className="bg-muted/30 p-4 rounded-xl border">
-        <ShiftHandoverDocument handover={handover} activities={activities} />
+      <div className="bg-muted/30 p-2 sm:p-4 rounded-xl border">
+        <ResponsiveScale baseWidth={800}>
+          <ShiftHandoverDocument handover={handover} activities={activities} />
+        </ResponsiveScale>
       </div>
     </div>
   )

@@ -196,18 +196,19 @@ export default function ApprovalsPage() {
   const currentHandovers = activeTab === "review" ? pendingHandovers : historyHandovers
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
       <div>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Approvals</h1>
-            <p className="text-muted-foreground mt-1">Review dan persetujuan form shift handover</p>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Approvals</h1>
+            <p className="text-muted-foreground mt-1 text-sm">Review dan persetujuan form shift handover</p>
           </div>
           <Button
             variant="outline"
             size="sm"
             onClick={async () => { setRefreshing(true); await fetchData(); setRefreshing(false) }}
             disabled={refreshing}
+            className="self-start"
           >
             <RefreshCw className={`h-4 w-4 mr-1 ${refreshing ? "animate-spin" : ""}`} />
             Refresh
@@ -252,22 +253,22 @@ export default function ApprovalsPage() {
           </Card>
         ) : (
           currentHandovers.map((handover) => (
-            <Card key={handover.id} className="p-4">
-              <div className="flex items-start justify-between gap-4">
+            <Card key={handover.id} className="p-3 sm:p-4">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold">{handover.form_number}</span>
+                    <span className="font-semibold text-sm sm:text-base">{handover.form_number}</span>
                     <Badge variant={getStatusBadge(handover.status)}
                       className={handover.status === "rejected" ? "bg-red-600 text-white border-red-700 hover:bg-red-700" : ""}
                     >
                       {getStatusLabel(handover.status)}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                     {handover.shifts?.name} &middot;{" "}
                     {new Date(handover.tanggal).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     Operator: {handover.profiles?.full_name}
                   </p>
                   {handover.status === "approved" && (

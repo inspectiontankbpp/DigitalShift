@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { ShiftHandoverDocument } from "@/components/handover/shift-handover-document"
+import { ResponsiveScale } from "@/components/responsive-scale"
 import { Button } from "@/components/ui/button"
 import { Printer, ArrowLeft, Loader2 } from "lucide-react"
 
@@ -86,7 +87,11 @@ export default function HandoverPrintPage() {
         </Button>
       </div>
 
-      <ShiftHandoverDocument handover={handover} activities={activities} />
+      <div className="max-w-4xl mx-auto print:max-w-none">
+        <ResponsiveScale baseWidth={800} className="print:!overflow-visible print:!block">
+          <ShiftHandoverDocument handover={handover} activities={activities} />
+        </ResponsiveScale>
+      </div>
     </div>
   )
 }

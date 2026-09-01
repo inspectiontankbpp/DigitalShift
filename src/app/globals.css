@@ -74,6 +74,11 @@ body {
   body {
     background: white !important;
   }
+  /* Reset responsive scaling for print */
+  [style*="transform: scale"] {
+    transform: none !important;
+    width: 100% !important;
+  }
 }
 
 @keyframes slide-in-from-right {

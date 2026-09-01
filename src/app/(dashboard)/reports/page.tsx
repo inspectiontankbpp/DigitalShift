@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { FileText, Download, Filter, Loader2 } from "lucide-react"
+import { FileText, Download, Filter, Loader2, FileDown } from "lucide-react"
 
 interface Handover {
   id: string
@@ -104,6 +104,14 @@ export default function ReportsPage() {
     }
   }
 
+  const handleExportPDF = () => {
+    const params = new URLSearchParams()
+    if (filterDate) params.set("date", filterDate)
+    if (filterStatus) params.set("status", filterStatus)
+    const url = `/reports/print${params.toString() ? "?" + params.toString() : ""}`
+    window.open(url, "_blank")
+  }
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, string> = {
       draft: "bg-blue-100 text-blue-800",
@@ -120,19 +128,25 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Reports</h1>
           <p className="text-muted-foreground mt-1">Export and view shift reports</p>
         </div>
-        <Button onClick={handleExport} disabled={exporting || handovers.length === 0}>
-          {exporting ? (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <Download className="h-4 w-4 mr-2" />
-          )}
-          Export CSV
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={handleExportPDF} disabled={handovers.length === 0} variant="outline" size="sm">
+            <FileDown className="h-4 w-4 mr-2" />
+            PDF
+          </Button>
+          <Button onClick={handleExport} disabled={exporting || handovers.length === 0} size="sm">
+            {exporting ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
+            CSV
+          </Button>
+        </div>
       </div>
 
       <Card className="p-4">
@@ -188,68 +202,80 @@ export default function ReportsPage() {
             <p>No reports found</p>
           </div>
         ) : (
-          <div className="w-full overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-3 text-left font-medium">Form Number</th>
-                  <th className="px-4 py-3 text-left font-medium">Date</th>
-                  <th className="px-4 py-3 text-left font-medium">Shift</th>
-                  <th className="px-4 py-3 text-left font-medium">Operator</th>
-                  <th className="px-4 py-3 text-left font-medium">Status</th>
-                  <th className="px-4 py-3 text-left font-medium">Submitted</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {handovers.map((h) => (
-                  <tr key={h.id} className="hover:bg-muted/50">
-                    <td className="px-4 py-3 font-medium">
-                      <a href={`/handover/${h.id}`} className="text-primary hover:underline">
-                        {h.form_number}
-                      </a>
-                    </td>
-                    <td className="px-4 py-3">{new Date(h.tanggal).toLocaleDateString()}</td>
-                    <td className="px-4 py-3">{h.shifts?.name}</td>
-                    <td className="px-4 py-3">{h.profiles?.full_name}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadge(h.status)}`}>
-                        {h.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {h.submitted_at ? new Date(h.submitted_at).toLocaleString() : "-"}
-                    </td>
+          <>
+            {/* Desktop Table */}
+            <div className="hidden md:block w-full overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3 text-left font-medium">Form Number</th>
+                    <th className="px-4 py-3 text-left font-medium">Date</th>
+                    <th className="px-4 py-3 text-left font-medium">Shift</th>
+                    <th className="px-4 py-3 text-left font-medium">Operator</th>
+                    <th className="px-4 py-3 text-left font-medium">Status</th>
+                    <th className="px-4 py-3 text-left font-medium">Submitted</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y">
+                  {handovers.map((h) => (
+                    <tr key={h.id} className="hover:bg-muted/50">
+                      <td className="px-4 py-3 font-medium">
+                        <a href={`/handover/${h.id}`} className="text-primary hover:underline">
+                          {h.form_number}
+                        </a>
+                      </td>
+                      <td className="px-4 py-3">{new Date(h.tanggal).toLocaleDateString()}</td>
+                      <td className="px-4 py-3">{h.shifts?.name}</td>
+                      <td className="px-4 py-3">{h.profiles?.full_name}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadge(h.status)}`}>
+                          {h.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {h.submitted_at ? new Date(h.submitted_at).toLocaleString() : "-"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Cards */}
+            <div className="md:hidden divide-y">
+              {handovers.map((h) => (
+                <a key={h.id} href={`/handover/${h.id}`} className="block p-4 hover:bg-muted/50">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-medium text-sm">{h.form_number}</span>
+                    <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium ${getStatusBadge(h.status)}`}>
+                      {h.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{h.shifts?.name} &middot; {h.profiles?.full_name}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {new Date(h.tanggal).toLocaleDateString()}
+                    {h.submitted_at ? ` &middot; ${new Date(h.submitted_at).toLocaleString()}` : ""}
+                  </p>
+                </a>
+              ))}
+            </div>
+          </>
         )}
       </Card>
 
       {!loading && handovers.length > 0 && (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-sm text-muted-foreground">
-            Showing {page * pageSize + 1} - {Math.min((page + 1) * pageSize, totalCount)} of {totalCount} records
+            {page * pageSize + 1} - {Math.min((page + 1) * pageSize, totalCount)} dari {totalCount}
           </p>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => p - 1)}
-              disabled={page === 0}
-            >
-              Previous
+            <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page === 0}>
+              Prev
             </Button>
-            <span className="text-sm text-muted-foreground px-3">
-              Page {page + 1} of {Math.ceil(totalCount / pageSize)}
+            <span className="text-xs text-muted-foreground">
+              {page + 1}/{Math.ceil(totalCount / pageSize)}
             </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => p + 1)}
-              disabled={(page + 1) * pageSize >= totalCount}
-            >
+            <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={(page + 1) * pageSize >= totalCount}>
               Next
             </Button>
           </div>

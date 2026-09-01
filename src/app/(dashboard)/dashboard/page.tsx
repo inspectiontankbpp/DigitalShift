@@ -108,31 +108,31 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Ringkasan operasional shift hari ini</p>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-muted-foreground mt-1 text-sm">Ringkasan operasional shift hari ini</p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">{today.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span>
+          <span className="text-xs sm:text-sm text-muted-foreground">{today.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="flex flex-wrap gap-3">
-        <Link href="/handover" className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+        <Link href="/handover" className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm">
           <Plus className="h-4 w-4" />
           Buat Handover Baru
         </Link>
-        <Link href="/approvals" className="inline-flex items-center gap-2 rounded-lg border bg-card px-4 py-2.5 text-sm font-medium hover:bg-muted/50 transition-colors shadow-sm">
+        <Link href="/approvals" className="inline-flex items-center justify-center gap-2 rounded-lg border bg-card px-4 py-2.5 text-sm font-medium hover:bg-muted/50 transition-colors shadow-sm">
           <CheckSquare className="h-4 w-4" />
           Approvals
           {stats.pendingApprovals > 0 && (
             <span className="ml-1 rounded-full bg-red-500 px-2 py-0.5 text-xs text-white">{stats.pendingApprovals}</span>
           )}
         </Link>
-        <Link href="/reports" className="inline-flex items-center gap-2 rounded-lg border bg-card px-4 py-2.5 text-sm font-medium hover:bg-muted/50 transition-colors shadow-sm">
+        <Link href="/reports" className="inline-flex items-center justify-center gap-2 rounded-lg border bg-card px-4 py-2.5 text-sm font-medium hover:bg-muted/50 transition-colors shadow-sm">
           <TrendingUp className="h-4 w-4" />
           Laporan & Export
         </Link>
@@ -210,7 +210,8 @@ export default async function DashboardPage() {
         </div>
 
         <Card className="overflow-hidden">
-          <div className="w-full overflow-x-auto">
+          {/* Desktop Table */}
+          <div className="hidden md:block w-full overflow-x-auto">
             <table className="w-full text-sm">
               <caption className="sr-only">Aktivitas terbaru handover</caption>
               <thead className="bg-muted text-muted-foreground">
@@ -256,6 +257,30 @@ export default async function DashboardPage() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden divide-y">
+            {!recentHandovers?.length ? (
+              <div className="px-4 py-8 text-center text-muted-foreground text-sm">
+                Belum ada form handover.
+              </div>
+            ) : (
+              recentHandovers.map((h: Record<string, unknown>) => (
+                <Link key={String(h.id)} href={`/handover/${h.id}`} className="block p-4 hover:bg-muted/50">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-medium text-sm">{String(h.form_number || "")}</span>
+                    <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium ${getStatusBadge(String(h.status || ""))}`}>
+                      {String(h.status || "")}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {String((h.profiles as Record<string, unknown>)?.full_name || "-")} &middot;{" "}
+                    {(h.shifts as Record<string, unknown>)?.name ? String((h.shifts as Record<string, unknown>).name) : "-"}
+                  </p>
+                </Link>
+              ))
+            )}
           </div>
         </Card>
       </div>

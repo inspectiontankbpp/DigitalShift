@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Plus, Trash2, Save, Send, Loader2, ArrowLeft, CheckSquare, Layers, AlertCircle } from "lucide-react"
+import { ResponsiveScale } from "@/components/responsive-scale"
 import { useToast } from "@/contexts/toast-context"
 import { useUser } from "@/contexts/user-context"
 import {
@@ -321,6 +322,7 @@ export default function EditHandoverPage() {
         </div>
       )}
 
+      <ResponsiveScale baseWidth={800}>
       <form onSubmit={(e) => { e.preventDefault(); handleSave("submitted") }} className="space-y-6">
         <Card className="p-0 overflow-hidden">
           <div className="bg-primary/5 p-4 border-b">
@@ -634,6 +636,7 @@ export default function EditHandoverPage() {
           </Button>
         </div>
       </form>
+      </ResponsiveScale>
     </div>
   )
 }
