@@ -362,8 +362,6 @@ export function ShiftHandoverDocument({ handover, activities = [] }: ShiftHandov
                 <span>{teams.yangMenyerahkan?.anggota3 || "-"}</span>
               </div>
             </div>
-            <div className="mt-8 border-b border-dashed border-black w-32 mx-auto"></div>
-            <div className="text-center text-[10px] text-gray-500 mt-1">TTD Operator Menyerahkan</div>
           </div>
 
           {/* Yang Menerima */}
@@ -389,8 +387,6 @@ export function ShiftHandoverDocument({ handover, activities = [] }: ShiftHandov
                 <span>{teams.yangMenerima?.anggota3 || "-"}</span>
               </div>
             </div>
-            <div className="mt-8 border-b border-dashed border-black w-32 mx-auto"></div>
-            <div className="text-center text-[10px] text-gray-500 mt-1">TTD Operator Menerima</div>
           </div>
         </div>
 
