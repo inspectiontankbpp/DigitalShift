@@ -1,0 +1,94 @@
+/// Fakta pemeriksaan QC.
+table QCFact
+	lineageTag: 24510459-01ed-4d83-9bf4-1c1626dac6cd
+
+	column handover_id
+		dataType: string
+		isHidden
+		lineageTag: 19a51aa9-eeda-495d-a476-41ea0114efb8
+		sourceColumn: handover_id
+
+	column form_number
+		dataType: string
+		lineageTag: 47df836c-cd66-41c1-ac44-c5f1e935cfcd
+		sourceColumn: form_number
+
+	column tanggal_operasional
+		dataType: dateTime
+		lineageTag: db88799c-c2f6-4a2d-9d26-b8f96d28db14
+		sourceColumn: tanggal_operasional
+
+	column shift_id
+		dataType: string
+		isHidden
+		lineageTag: f03c8f84-824f-471a-9a1c-3347009614c3
+		sourceColumn: shift_id
+
+	column shift_name
+		dataType: string
+		isHidden
+		lineageTag: e791d3b2-8bef-4d4c-a1c2-e1321d51d210
+		sourceColumn: shift_name
+
+	column regu_shift
+		dataType: string
+		isHidden
+		lineageTag: c249e856-1146-4b69-b3be-b968c41006d5
+		sourceColumn: regu_shift
+
+	column operator_id
+		dataType: string
+		isHidden
+		lineageTag: 1e0fd1f7-f323-4975-8e23-90ad270dc25f
+		sourceColumn: operator_id
+
+	column operator_name
+		dataType: string
+		isHidden
+		lineageTag: ba261689-6757-4485-ab38-3b378a5d4794
+		sourceColumn: operator_name
+
+	column no_sarfas
+		dataType: string
+		lineageTag: 6779cbae-6b1c-445c-bf38-f8f7de6ffff6
+		sourceColumn: no_sarfas
+
+	column visual
+		dataType: string
+		lineageTag: d9cdb0a9-e702-42ff-9484-99de636d3e9c
+		sourceColumn: visual
+
+	column density_text
+		dataType: string
+		lineageTag: e8162031-bd21-4cee-bdef-cbc56d51ecef
+		sourceColumn: density_text
+
+	column density
+		dataType: decimal
+		lineageTag: 3cd558dd-12ff-4a97-ba2a-ed3eb4ae8a7d
+		sourceColumn: density
+
+	column temperatur_text
+		dataType: string
+		lineageTag: d5d7d978-2792-46bf-aeba-2a3c46581f6c
+		sourceColumn: temperatur_text
+
+	column temperatur_c
+		dataType: decimal
+		lineageTag: 964b8fa3-c2cd-4c78-8617-c4485a938cee
+		sourceColumn: temperatur_c
+
+	column keterangan
+		dataType: string
+		lineageTag: 65f7800e-cd69-4de5-8294-b3cfe7efbbdc
+		sourceColumn: keterangan
+
+	partition QCFact = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="qc_fact"]}[Data]
+				in
+				    Nav
+

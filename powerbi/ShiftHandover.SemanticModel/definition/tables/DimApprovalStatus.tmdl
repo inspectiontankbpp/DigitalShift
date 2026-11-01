@@ -1,0 +1,37 @@
+/// Dimensi status approval.
+table DimApprovalStatus
+	lineageTag: d1478841-da37-46d9-b541-25114c2f8b60
+
+	column status_code
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: 3f933996-8b7e-4725-a378-fc7bfc871a03
+		sourceColumn: status_code
+
+	column status_name
+		dataType: string
+		lineageTag: 2013205e-19e4-4fab-9efa-b8f854a64bf8
+		sourceColumn: status_name
+		sortByColumn: status_sort
+
+	column status_sort
+		dataType: int64
+		isHidden
+		lineageTag: 64eed3d2-2612-4523-b4eb-afe12e50356f
+		sourceColumn: status_sort
+
+	column is_final
+		dataType: boolean
+		lineageTag: 9a956db4-1c15-48f7-81f6-aca7305a0430
+		sourceColumn: is_final
+
+	partition DimApprovalStatus = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="dim_approval_status"]}[Data]
+				in
+				    Nav
+

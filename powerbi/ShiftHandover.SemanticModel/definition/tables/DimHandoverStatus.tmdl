@@ -1,0 +1,42 @@
+/// Dimensi status handover.
+table DimHandoverStatus
+	lineageTag: 17ef51b9-45ac-4636-b71f-210fe9e8bdbf
+
+	column status_code
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: f21d2a2e-c963-4d4f-bad4-529b7355e8e1
+		sourceColumn: status_code
+
+	column status_name
+		dataType: string
+		lineageTag: 522a6f4f-35c9-4d73-b344-ac6b2a04c477
+		sourceColumn: status_name
+		sortByColumn: status_sort
+
+	column status_sort
+		dataType: int64
+		isHidden
+		lineageTag: 9f480931-a062-4896-9cdc-3178adcd0549
+		sourceColumn: status_sort
+
+	column is_final
+		dataType: boolean
+		lineageTag: 3bc0984d-7644-4cf6-b287-a0296bcd3cec
+		sourceColumn: is_final
+
+	column is_pending
+		dataType: boolean
+		lineageTag: f6ff8c58-ce04-4008-9714-b0eb771f69ba
+		sourceColumn: is_pending
+
+	partition DimHandoverStatus = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="dim_handover_status"]}[Data]
+				in
+				    Nav
+

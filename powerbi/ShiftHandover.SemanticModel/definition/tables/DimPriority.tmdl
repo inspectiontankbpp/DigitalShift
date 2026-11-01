@@ -1,0 +1,32 @@
+/// Dimensi prioritas outstanding job.
+table DimPriority
+	lineageTag: 8f6f081c-a91e-4ece-86ce-f9b4a9d4d083
+
+	column priority_code
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: 7cb3d4b7-adcd-42a9-8201-4fa6c60603e0
+		sourceColumn: priority_code
+
+	column priority_name
+		dataType: string
+		lineageTag: 256c6640-0a38-4e7e-a27f-99eee87187ae
+		sourceColumn: priority_name
+		sortByColumn: priority_sort
+
+	column priority_sort
+		dataType: int64
+		isHidden
+		lineageTag: aad3506c-16c0-4d0a-9aeb-6ec235ef2877
+		sourceColumn: priority_sort
+
+	partition DimPriority = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="dim_priority"]}[Data]
+				in
+				    Nav
+

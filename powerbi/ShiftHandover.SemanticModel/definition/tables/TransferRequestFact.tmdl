@@ -1,0 +1,90 @@
+/// Fakta permintaan transfer produk.
+table TransferRequestFact
+	lineageTag: 97255f1a-bc25-4af7-a1af-31f5a02c7ea5
+
+	column handover_id
+		dataType: string
+		isHidden
+		lineageTag: 5d6616dc-a9b1-443c-b832-676978dc163d
+		sourceColumn: handover_id
+
+	column form_number
+		dataType: string
+		lineageTag: 946bd656-e1cb-4f1e-bd00-a5a43fc9394f
+		sourceColumn: form_number
+
+	column tanggal_operasional
+		dataType: dateTime
+		lineageTag: 69d1ee73-3a96-4e6a-bbb7-bf5a1454101b
+		sourceColumn: tanggal_operasional
+
+	column shift_id
+		dataType: string
+		isHidden
+		lineageTag: ecbb5162-f96f-44c3-86aa-1ee2ab857eff
+		sourceColumn: shift_id
+
+	column shift_name
+		dataType: string
+		isHidden
+		lineageTag: 5b0deb42-651f-4673-a7fd-ab24e179f1f6
+		sourceColumn: shift_name
+
+	column regu_shift
+		dataType: string
+		isHidden
+		lineageTag: 389eca8f-d4cc-46f7-82e8-6dd462562949
+		sourceColumn: regu_shift
+
+	column operator_id
+		dataType: string
+		isHidden
+		lineageTag: edcfcb75-bb03-4243-8811-d26a20287b27
+		sourceColumn: operator_id
+
+	column operator_name
+		dataType: string
+		isHidden
+		lineageTag: db49296c-2fee-4c35-828e-e416021afd01
+		sourceColumn: operator_name
+
+	column no_tangki
+		dataType: string
+		lineageTag: e5de5849-24f0-4ee4-a693-a6f7485ce716
+		sourceColumn: no_tangki
+
+	column nama_produk
+		dataType: string
+		isHidden
+		lineageTag: d97d7713-177c-44e3-b17d-a733dce3ee65
+		sourceColumn: nama_produk
+
+	column est_jumlah_kl_text
+		dataType: string
+		lineageTag: c197820a-f90c-45ed-a316-1fb84c76c16f
+		sourceColumn: est_jumlah_kl_text
+
+	column est_jumlah_kl
+		dataType: decimal
+		lineageTag: 18bb8265-1d20-4455-8b0e-a59c04600834
+		sourceColumn: est_jumlah_kl
+
+	column estimasi_jam
+		dataType: string
+		lineageTag: dace2597-0984-4cbe-833a-16a7d97c6b32
+		sourceColumn: estimasi_jam
+
+	column keterangan
+		dataType: string
+		lineageTag: e0d2314f-6472-42b6-9975-6fa0799d60df
+		sourceColumn: keterangan
+
+	partition TransferRequestFact = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="transfer_request_fact"]}[Data]
+				in
+				    Nav
+

@@ -1,0 +1,492 @@
+/// Fakta utama handover, satu baris per handover.
+table HandoverFact
+	lineageTag: e56452ca-d561-4ad3-a544-425a1afa67de
+
+	/// Jumlah handover.
+	measure 'Total Handover' = COUNTROWS(HandoverFact)
+		formatString: #,##0
+		lineageTag: 43f6b039-7512-46b5-b0b0-24afb023ff34
+
+	/// Jumlah handover berstatus draft.
+	measure 'Handover Draft' = CALCULATE([Total Handover], HandoverFact[is_draft] = TRUE())
+		formatString: #,##0
+		lineageTag: 36d8c2f6-6eee-4975-a601-dcf678967fd0
+
+	/// Jumlah handover submitted.
+	measure 'Handover Submitted' = CALCULATE([Total Handover], HandoverFact[is_submitted] = TRUE())
+		formatString: #,##0
+		lineageTag: 18248696-38d2-40ce-a1d7-b4f3ff7cbbe3
+
+	/// Jumlah handover approved.
+	measure 'Handover Approved' = CALCULATE([Total Handover], HandoverFact[is_approved] = TRUE())
+		formatString: #,##0
+		lineageTag: 26de84cd-0319-407a-a60f-7d3e9d22cc2f
+
+	/// Jumlah handover rejected.
+	measure 'Handover Rejected' = CALCULATE([Total Handover], HandoverFact[is_rejected] = TRUE())
+		formatString: #,##0
+		lineageTag: c6e1e968-aea7-4824-af34-566d37b65281
+
+	/// Jumlah handover reopened.
+	measure 'Handover Reopened' = CALCULATE([Total Handover], HandoverFact[is_reopened] = TRUE())
+		formatString: #,##0
+		lineageTag: 47a2ecce-c8fe-487a-968e-6489282154af
+
+	/// Handover yang masih pending.
+	measure 'Handover Pending' = CALCULATE([Total Handover], HandoverFact[is_pending] = TRUE())
+		formatString: #,##0
+		lineageTag: 8c121db5-db67-465c-a066-66d679bd43e7
+
+	/// Persentase handover approved.
+	measure 'Approval Rate' = DIVIDE([Handover Approved], [Total Handover])
+		formatString: 0.0%
+		lineageTag: c72190db-0c60-4e8c-afc8-4d5793749aff
+
+	/// Persentase handover rejected.
+	measure 'Rejection Rate' = DIVIDE([Handover Rejected], [Total Handover])
+		formatString: 0.0%
+		lineageTag: 71739458-654d-42e6-b62d-bdcb2528d25a
+
+	/// Persentase handover pending.
+	measure 'Pending Rate' = DIVIDE([Handover Pending], [Total Handover])
+		formatString: 0.0%
+		lineageTag: 7893af15-20c3-4d83-a29b-73b41a38b8d3
+
+	/// Handover yang mencatat kendala.
+	measure 'Handover with Kendala' = CALCULATE([Total Handover], HandoverFact[has_kendala] = TRUE())
+		formatString: #,##0
+		lineageTag: a721f7e0-76d8-431b-a431-ebd8f732d377
+
+	/// Handover yang mencatat safety issue.
+	measure 'Handover with Safety Issue' = CALCULATE([Total Handover], HandoverFact[has_safety_issue] = TRUE())
+		formatString: #,##0
+		lineageTag: 9cec7139-e034-4e21-917c-486d54bb6971
+
+	/// Handover yang memiliki catatan.
+	measure 'Handover with Catatan' = CALCULATE([Total Handover], HandoverFact[has_catatan] = TRUE())
+		formatString: #,##0
+		lineageTag: 330747b3-caf1-49a6-8560-5bf94b00dcdc
+
+	/// Rata-rata skor kelengkapan data handover.
+	measure 'Data Completeness' = AVERAGE(HandoverFact[data_completeness_score])
+		formatString: 0.0%
+		lineageTag: 9d208698-98e8-4de4-b8d3-cc889284e358
+
+	/// Tanggal handover terakhir.
+	measure 'Latest Handover Date' = MAX(HandoverFact[tanggal_operasional])
+		formatString: dd/mm/yyyy
+		lineageTag: 34f7568e-12e0-4275-80e3-8f36827e2b8c
+
+	/// Handover month-to-date.
+	measure 'Handover MTD' = TOTALMTD([Total Handover], DimDate[date])
+		formatString: #,##0
+		lineageTag: 730adf5a-cecf-4e18-87a9-a0ffc493f638
+
+	/// Handover year-to-date.
+	measure 'Handover YTD' = TOTALYTD([Total Handover], DimDate[date])
+		formatString: #,##0
+		lineageTag: d6bdb9dd-3549-4810-b189-28fc7224f995
+
+	/// Handover bulan sebelumnya.
+	measure 'Handover Previous Month' = CALCULATE([Total Handover], PREVIOUSMONTH(DimDate[date]))
+		formatString: #,##0
+		lineageTag: aa471a3a-2d34-40ec-a2b7-09ded1f895e4
+
+	/// Perubahan handover month-over-month.
+	measure 'Handover MoM %' = DIVIDE([Total Handover] - [Handover Previous Month], [Handover Previous Month])
+		formatString: 0.0%
+		lineageTag: d4048353-543b-46f9-836d-975be3647119
+
+	/// Jumlah baris aktivitas.
+	measure 'Total Aktivitas' = COUNTROWS(ActivityFact)
+		formatString: #,##0
+		lineageTag: 61e9c10a-99f1-4014-ac0e-f777da6077d8
+
+	/// Jumlah baris approval.
+	measure 'Total Approval' = COUNTROWS(ApprovalFact)
+		formatString: #,##0
+		lineageTag: be008e87-1c8e-49a7-870c-b1f0afc7f97f
+
+	/// Rata-rata waktu keputusan approval dalam menit.
+	measure 'Rata-rata Waktu Approval (menit)' = AVERAGE(ApprovalFact[decision_minutes])
+		formatString: #,##0.0
+		lineageTag: 093aae0e-b2c4-403a-a38c-764277d46249
+
+	/// Median waktu keputusan approval dalam menit.
+	measure 'Median Waktu Approval (menit)' = MEDIAN(ApprovalFact[decision_minutes])
+		formatString: #,##0.0
+		lineageTag: d2ad3011-c427-45ea-8c5e-4bfc70b84a41
+
+	/// Rata-rata jeda submit handover dalam menit.
+	measure 'Rata-rata Waktu Submit (menit)' = AVERAGE(HandoverFact[submission_delay_minutes])
+		formatString: #,##0.0
+		lineageTag: 7b6515c5-5e2b-4a11-b855-f74fc314f50a
+
+	/// Jumlah outstanding job.
+	measure 'Total Outstanding Job' = COUNTROWS(OutstandingJobFact)
+		formatString: #,##0
+		lineageTag: 53d15d47-0e65-4c5d-9830-f56fbad4b1e5
+
+	/// Outstanding job yang masih open.
+	measure 'Open Job' = CALCULATE([Total Outstanding Job], OutstandingJobFact[is_open] = TRUE())
+		formatString: #,##0
+		lineageTag: 41d89522-7c9e-4b2d-ad5a-f5c09ceb566b
+
+	/// Outstanding job yang overdue.
+	measure 'Overdue Job' = CALCULATE([Total Outstanding Job], OutstandingJobFact[is_overdue] = TRUE())
+		formatString: #,##0
+		lineageTag: dbcb4e10-626f-4fff-bcd6-e6752646cec5
+
+	/// Jumlah baris critical equipment.
+	measure 'Total Critical Equipment' = COUNTROWS(CriticalEquipmentFact)
+		formatString: #,##0
+		lineageTag: 4a718d86-fa0a-4277-a1d6-8d0278a3240a
+
+	/// Critical equipment dengan issue.
+	measure 'Critical Equipment Issue' = CALCULATE([Total Critical Equipment], CriticalEquipmentFact[is_issue] = TRUE())
+		formatString: #,##0
+		lineageTag: ecda2ab9-c4aa-462b-9c87-d44c4284cc09
+
+	/// Persentase critical equipment bermasalah.
+	measure 'Critical Equipment Issue Rate' = DIVIDE([Critical Equipment Issue], [Total Critical Equipment])
+		formatString: 0.0%
+		lineageTag: 529da530-67f3-4492-957d-682b3bdf7810
+
+	/// Jumlah baris safety tool.
+	measure 'Total Safety Tool' = COUNTROWS(SafetyToolFact)
+		formatString: #,##0
+		lineageTag: 255355e0-651e-45e7-9bcf-cba22f8f5cbf
+
+	/// Safety tool dengan issue.
+	measure 'Safety Tool Issue' = CALCULATE([Total Safety Tool], SafetyToolFact[is_issue] = TRUE())
+		formatString: #,##0
+		lineageTag: 0e258e54-060a-4c1c-bb46-a9b31492f46b
+
+	/// Persentase safety tool bermasalah.
+	measure 'Safety Tool Issue Rate' = DIVIDE([Safety Tool Issue], [Total Safety Tool])
+		formatString: 0.0%
+		lineageTag: 7335a83f-d56e-4856-9df1-77f709c7a325
+
+	/// Jumlah baris level tank dengan nomor tank valid.
+	measure 'Total Tank Level' = CALCULATE(COUNTROWS(TankLevelFact), TankLevelFact[no_tanki_normalized] <> BLANK())
+		formatString: #,##0
+		lineageTag: ff548c07-eeae-444f-8231-a5a64a12d5a7
+
+	/// Rata-rata level tank dalam mm, hanya tank valid.
+	measure 'Rata-rata Level Tank (mm)' = CALCULATE(AVERAGE(TankLevelFact[level_mm]), TankLevelFact[no_tanki_normalized] <> BLANK())
+		formatString: #,##0.0
+		lineageTag: 2f7d38f7-72c6-4dec-9d3d-0f6ec0400ae6
+
+	/// Rata-rata water content dalam mm, hanya tank valid.
+	measure 'Rata-rata Water Content (mm)' = CALCULATE(AVERAGE(TankLevelFact[water_mm]), TankLevelFact[no_tanki_normalized] <> BLANK())
+		formatString: #,##0.0
+		lineageTag: 176a613b-8c5c-497d-9e71-30236572a216
+
+	/// Jumlah baris QC.
+	measure 'Total QC' = COUNTROWS(QCFact)
+		formatString: #,##0
+		lineageTag: d9e3c93a-6fbc-4392-aa7a-dab21cc74821
+
+	/// Rata-rata density QC.
+	measure 'Rata-rata Density' = AVERAGE(QCFact[density])
+		formatString: #,##0.00
+		lineageTag: dbde7e46-7801-4e63-b439-b9641d6db016
+
+	/// Rata-rata temperatur QC.
+	measure 'Rata-rata Temperatur' = AVERAGE(QCFact[temperatur_c])
+		formatString: #,##0.0
+		lineageTag: 2f11e60f-fb13-4d65-bbf0-25931a7730b6
+
+	/// Jumlah permintaan transfer.
+	measure 'Total Transfer Request' = COUNTROWS(TransferRequestFact)
+		formatString: #,##0
+		lineageTag: 1c44e901-b634-4837-a692-324e1ab8a249
+
+	/// Total estimasi volume transfer dalam KL.
+	measure 'Total Estimasi Transfer (KL)' = SUM(TransferRequestFact[est_jumlah_kl])
+		formatString: #,##0.0
+		lineageTag: f96e128c-6982-4b8d-9829-8f396cd7542c
+
+	column handover_id
+		dataType: string
+		isHidden
+		lineageTag: 3424107c-3c31-45b8-be31-50917a18339d
+		sourceColumn: handover_id
+
+	column form_number
+		dataType: string
+		lineageTag: dc4d86cb-8c14-41d1-90c3-b51dc2270d17
+		sourceColumn: form_number
+
+	column tanggal_operasional
+		dataType: dateTime
+		lineageTag: c9639815-bbfa-4514-9ab8-b0bcc78c5847
+		sourceColumn: tanggal_operasional
+
+	column status
+		dataType: string
+		isHidden
+		lineageTag: cc2aa271-2b3c-48a4-bfdd-3e5c8401cd7c
+		sourceColumn: status
+
+	column shift_id
+		dataType: string
+		isHidden
+		lineageTag: 1e416a70-2abc-4c94-92f0-74c78b154df9
+		sourceColumn: shift_id
+
+	column shift_name
+		dataType: string
+		isHidden
+		lineageTag: 3dd8e8c7-db10-411f-ab47-3ebcd3d733b2
+		sourceColumn: shift_name
+
+	column shift_start_time
+		dataType: string
+		lineageTag: d67c79dd-f5fb-4382-9c3c-8c4995126ab2
+		sourceColumn: shift_start_time
+
+	column shift_end_time
+		dataType: string
+		lineageTag: 8ee5d42e-9767-4cae-8f00-f7a573abca6b
+		sourceColumn: shift_end_time
+
+	column regu_shift
+		dataType: string
+		isHidden
+		lineageTag: 7a75981b-320d-4c33-a1a7-281cff5ec9c0
+		sourceColumn: regu_shift
+
+	column shift_name_operational
+		dataType: string
+		lineageTag: 3be78461-a349-44ae-8022-60b09fef016a
+		sourceColumn: shift_name_operational
+
+	column jam_shift
+		dataType: string
+		lineageTag: a5ae2cfe-7b38-4c3f-b4a1-3deb7456fe55
+		sourceColumn: jam_shift
+
+	column operator_id
+		dataType: string
+		isHidden
+		lineageTag: 6dc35205-17ca-43b4-b7f9-d145667754d7
+		sourceColumn: operator_id
+
+	column operator_name
+		dataType: string
+		isHidden
+		lineageTag: 1c70d7c6-bcc4-4f1a-a113-66a3a75e2b02
+		sourceColumn: operator_name
+
+	column supervisor_id
+		dataType: string
+		isHidden
+		lineageTag: 3af87332-fdd9-4be5-a1f6-1060480d5703
+		sourceColumn: supervisor_id
+
+	column supervisor_name
+		dataType: string
+		isHidden
+		lineageTag: b028fad2-b1de-43e4-99ce-1359f5acca3f
+		sourceColumn: supervisor_name
+
+	column kondisi_operasional
+		dataType: string
+		lineageTag: e5c47d15-d8df-44b8-876c-5f831018bd74
+		sourceColumn: kondisi_operasional
+
+	column kendala
+		dataType: string
+		lineageTag: 82aecf70-0061-4de6-9612-71144611d64e
+		sourceColumn: kendala
+
+	column safety_issue
+		dataType: string
+		lineageTag: 41b69761-c6ea-4572-8e1c-5d1f5e0fe785
+		sourceColumn: safety_issue
+
+	column catatan
+		dataType: string
+		lineageTag: 9a7c810d-fc74-44f0-a6b5-e5cdb7fcae2e
+		sourceColumn: catatan
+
+	column created_at
+		dataType: dateTime
+		lineageTag: d992d739-99a1-4b82-ac0e-13167b3ff770
+		sourceColumn: created_at
+
+	column submitted_at
+		dataType: dateTime
+		lineageTag: 742c9ce1-7da6-45a4-a0a5-fbcf003057b0
+		sourceColumn: submitted_at
+
+	column approved_at
+		dataType: dateTime
+		lineageTag: 1fdf6a1d-c30a-4ee9-8064-b80503950341
+		sourceColumn: approved_at
+
+	column rejected_at
+		dataType: dateTime
+		lineageTag: 46655d27-d0dc-4a70-b66a-7bb616833e84
+		sourceColumn: rejected_at
+
+	column reopened_at
+		dataType: dateTime
+		lineageTag: 930d59c9-dcd3-4eb6-b05d-81891b7f4d24
+		sourceColumn: reopened_at
+
+	column updated_at
+		dataType: dateTime
+		lineageTag: 5feebe4d-4320-471e-8f0e-d3c6714bc869
+		sourceColumn: updated_at
+
+	column decision_at
+		dataType: dateTime
+		lineageTag: 111ce216-093c-4473-9f00-942ce510c67a
+		sourceColumn: decision_at
+
+	column submission_delay_minutes
+		dataType: decimal
+		lineageTag: ca8f732c-2087-48a0-961a-778d4e630107
+		sourceColumn: submission_delay_minutes
+
+	column decision_minutes
+		dataType: decimal
+		lineageTag: 8c04786d-2cab-4ee1-80ef-7eb89eea73c4
+		sourceColumn: decision_minutes
+
+	column is_draft
+		dataType: boolean
+		lineageTag: e0e3d7e4-cbbd-406f-ba67-3aae272a5a42
+		sourceColumn: is_draft
+
+	column is_submitted
+		dataType: boolean
+		lineageTag: f2a15560-4015-4346-86ff-8a34f2c35bec
+		sourceColumn: is_submitted
+
+	column is_approved
+		dataType: boolean
+		lineageTag: cc96c010-2940-4bf4-b807-8b97ca1058ea
+		sourceColumn: is_approved
+
+	column is_rejected
+		dataType: boolean
+		lineageTag: 4c40a27a-df53-4613-8a84-9e2cf4d5eda9
+		sourceColumn: is_rejected
+
+	column is_reopened
+		dataType: boolean
+		lineageTag: 854348d4-b0b6-493f-8490-f49a1131a2eb
+		sourceColumn: is_reopened
+
+	column is_pending
+		dataType: boolean
+		lineageTag: a39fee56-ade7-499a-a47c-6687a19052c4
+		sourceColumn: is_pending
+
+	column has_kendala
+		dataType: boolean
+		lineageTag: bd229283-aeff-42f4-bd2a-b8025b1323ef
+		sourceColumn: has_kendala
+
+	column has_safety_issue
+		dataType: boolean
+		lineageTag: 8669d69d-9fe4-4285-9809-c527a8ccb68f
+		sourceColumn: has_safety_issue
+
+	column has_catatan
+		dataType: boolean
+		lineageTag: 434cfc6c-90de-494d-9fbe-abc0b11a3878
+		sourceColumn: has_catatan
+
+	column menyerahkan_danru
+		dataType: string
+		lineageTag: c194661f-1160-4da9-af57-54c3cc5d1ba1
+		sourceColumn: menyerahkan_danru
+
+	column menerima_danru
+		dataType: string
+		lineageTag: 989f202b-b2d9-4b41-9b16-d2f73d091b09
+		sourceColumn: menerima_danru
+
+	column mengetahui_spv
+		dataType: string
+		lineageTag: 552dd96f-4c3f-4511-8da4-595c7b71024c
+		sourceColumn: mengetahui_spv
+
+	column activity_count
+		dataType: int64
+		lineageTag: 55bb1e24-8e33-4fb5-b393-881ab1a17f3f
+		sourceColumn: activity_count
+
+	column approval_count
+		dataType: int64
+		lineageTag: e234b202-7df1-47ce-8a8b-661535bd1d1a
+		sourceColumn: approval_count
+
+	column outstanding_job_count
+		dataType: int64
+		lineageTag: 18aefdde-514f-4afd-9d41-942af2f275f5
+		sourceColumn: outstanding_job_count
+
+	column open_job_count
+		dataType: int64
+		lineageTag: 637e864f-0fbb-49fa-95f9-744ece1460a1
+		sourceColumn: open_job_count
+
+	column tank_level_count
+		dataType: int64
+		lineageTag: 6c00e9ca-dfab-4bf9-8185-15baad867de2
+		sourceColumn: tank_level_count
+
+	column qc_count
+		dataType: int64
+		lineageTag: 86952d96-a4c9-47a6-abd1-f369776dfe54
+		sourceColumn: qc_count
+
+	column critical_equipment_count
+		dataType: int64
+		lineageTag: ada48c18-8da8-4bd5-8bba-868e0c43617c
+		sourceColumn: critical_equipment_count
+
+	column critical_equipment_issue_count
+		dataType: int64
+		lineageTag: 1f81d5b3-1d8a-445e-bc66-b9b62f34a349
+		sourceColumn: critical_equipment_issue_count
+
+	column safety_tool_count
+		dataType: int64
+		lineageTag: 379e5adf-7d1d-433e-999b-67f3d27270ed
+		sourceColumn: safety_tool_count
+
+	column safety_tool_issue_count
+		dataType: int64
+		lineageTag: 04993b0e-fb0c-448e-955a-a2ec9492806d
+		sourceColumn: safety_tool_issue_count
+
+	column transfer_request_count
+		dataType: int64
+		lineageTag: 90f2da4c-f702-4b10-900e-c95c324987b3
+		sourceColumn: transfer_request_count
+
+	column estimated_transfer_kl
+		dataType: decimal
+		lineageTag: 8ed484ff-e91d-454f-957a-a01652a1e88e
+		sourceColumn: estimated_transfer_kl
+
+	column data_completeness_score
+		dataType: decimal
+		lineageTag: 190d19da-ad14-4af9-80b3-74f7e3f7c2bb
+		sourceColumn: data_completeness_score
+
+	partition HandoverFact = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="handover_fact"]}[Data]
+				in
+				    Nav
+

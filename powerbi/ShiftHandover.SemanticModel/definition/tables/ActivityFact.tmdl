@@ -1,0 +1,101 @@
+/// Fakta aktivitas operasional per handover.
+table ActivityFact
+	lineageTag: 3dfac82a-5489-442e-83a6-ae21b3a1879a
+
+	column activity_id
+		dataType: string
+		lineageTag: 54d71733-05af-462b-9ee7-c7c3748c06cb
+		sourceColumn: activity_id
+
+	column handover_id
+		dataType: string
+		isHidden
+		lineageTag: 8a0566ec-dc70-4bd7-b737-8f443a5c20cb
+		sourceColumn: handover_id
+
+	column form_number
+		dataType: string
+		lineageTag: 0fa7e236-39f3-4feb-8c1f-a49a50a2eb65
+		sourceColumn: form_number
+
+	column tanggal_operasional
+		dataType: dateTime
+		lineageTag: c70c57a1-0435-4188-95f3-bdc55440c083
+		sourceColumn: tanggal_operasional
+
+	column handover_status
+		dataType: string
+		isHidden
+		lineageTag: ff378373-beb6-40d2-ad26-31a9b6fee8ce
+		sourceColumn: handover_status
+
+	column shift_id
+		dataType: string
+		isHidden
+		lineageTag: 64e92721-088f-4a06-99eb-30438db618ab
+		sourceColumn: shift_id
+
+	column shift_name
+		dataType: string
+		isHidden
+		lineageTag: 2eb9b40d-ed30-4493-8e48-2de4510c7359
+		sourceColumn: shift_name
+
+	column regu_shift
+		dataType: string
+		isHidden
+		lineageTag: f0ede48c-602f-4002-a4e2-2a6fab0ca2e6
+		sourceColumn: regu_shift
+
+	column operator_id
+		dataType: string
+		isHidden
+		lineageTag: d85fc0cd-5daa-4a08-ba36-332c90079e3e
+		sourceColumn: operator_id
+
+	column operator_name
+		dataType: string
+		isHidden
+		lineageTag: 08fa3c34-14d7-4454-865c-65e33ce60f37
+		sourceColumn: operator_name
+
+	column waktu
+		dataType: string
+		lineageTag: 13f22ea6-f4a9-4793-9d84-09b7b5fbbfed
+		sourceColumn: waktu
+
+	column aktivitas
+		dataType: string
+		lineageTag: ac291818-27fb-45a0-8123-b96055921380
+		sourceColumn: aktivitas
+
+	column deskripsi
+		dataType: string
+		lineageTag: 62a77f6c-2e3b-4c64-897f-c978c24a9238
+		sourceColumn: deskripsi
+
+	column status
+		dataType: string
+		isHidden
+		lineageTag: 18480fa9-36ac-4c22-b409-bcacd41a0a9f
+		sourceColumn: status
+
+	column created_at
+		dataType: dateTime
+		lineageTag: 2f243434-dd37-4ac8-b6d8-5207694d48a9
+		sourceColumn: created_at
+
+	column updated_at
+		dataType: dateTime
+		lineageTag: 4f836d29-0ccf-4edf-a565-d2c2e39b2551
+		sourceColumn: updated_at
+
+	partition ActivityFact = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="activity_fact"]}[Data]
+				in
+				    Nav
+

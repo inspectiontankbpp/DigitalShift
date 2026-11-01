@@ -1,0 +1,126 @@
+// Measures untuk laporan Power BI Digital Shift Handover.
+// File ini dihasilkan dari semantic model PBIP; gunakan PBIP sebagai sumber utama.
+// HandoverFact
+
+Total Handover =
+COUNTROWS(HandoverFact)
+
+Handover Draft =
+CALCULATE([Total Handover], HandoverFact[is_draft] = TRUE())
+
+Handover Submitted =
+CALCULATE([Total Handover], HandoverFact[is_submitted] = TRUE())
+
+Handover Approved =
+CALCULATE([Total Handover], HandoverFact[is_approved] = TRUE())
+
+Handover Rejected =
+CALCULATE([Total Handover], HandoverFact[is_rejected] = TRUE())
+
+Handover Reopened =
+CALCULATE([Total Handover], HandoverFact[is_reopened] = TRUE())
+
+Handover Pending =
+CALCULATE([Total Handover], HandoverFact[is_pending] = TRUE())
+
+Approval Rate =
+DIVIDE([Handover Approved], [Total Handover])
+
+Rejection Rate =
+DIVIDE([Handover Rejected], [Total Handover])
+
+Pending Rate =
+DIVIDE([Handover Pending], [Total Handover])
+
+Handover with Kendala =
+CALCULATE([Total Handover], HandoverFact[has_kendala] = TRUE())
+
+Handover with Safety Issue =
+CALCULATE([Total Handover], HandoverFact[has_safety_issue] = TRUE())
+
+Handover with Catatan =
+CALCULATE([Total Handover], HandoverFact[has_catatan] = TRUE())
+
+Data Completeness =
+AVERAGE(HandoverFact[data_completeness_score])
+
+Latest Handover Date =
+MAX(HandoverFact[tanggal_operasional])
+
+Handover MTD =
+TOTALMTD([Total Handover], DimDate[date])
+
+Handover YTD =
+TOTALYTD([Total Handover], DimDate[date])
+
+Handover Previous Month =
+CALCULATE([Total Handover], PREVIOUSMONTH(DimDate[date]))
+
+Handover MoM % =
+DIVIDE([Total Handover] - [Handover Previous Month], [Handover Previous Month])
+
+Total Aktivitas =
+COUNTROWS(ActivityFact)
+
+Total Approval =
+COUNTROWS(ApprovalFact)
+
+Rata-rata Waktu Approval (menit) =
+AVERAGE(ApprovalFact[decision_minutes])
+
+Median Waktu Approval (menit) =
+MEDIAN(ApprovalFact[decision_minutes])
+
+Rata-rata Waktu Submit (menit) =
+AVERAGE(HandoverFact[submission_delay_minutes])
+
+Total Outstanding Job =
+COUNTROWS(OutstandingJobFact)
+
+Open Job =
+CALCULATE([Total Outstanding Job], OutstandingJobFact[is_open] = TRUE())
+
+Overdue Job =
+CALCULATE([Total Outstanding Job], OutstandingJobFact[is_overdue] = TRUE())
+
+Total Critical Equipment =
+COUNTROWS(CriticalEquipmentFact)
+
+Critical Equipment Issue =
+CALCULATE([Total Critical Equipment], CriticalEquipmentFact[is_issue] = TRUE())
+
+Critical Equipment Issue Rate =
+DIVIDE([Critical Equipment Issue], [Total Critical Equipment])
+
+Total Safety Tool =
+COUNTROWS(SafetyToolFact)
+
+Safety Tool Issue =
+CALCULATE([Total Safety Tool], SafetyToolFact[is_issue] = TRUE())
+
+Safety Tool Issue Rate =
+DIVIDE([Safety Tool Issue], [Total Safety Tool])
+
+Total Tank Level =
+CALCULATE(COUNTROWS(TankLevelFact), TankLevelFact[no_tanki_normalized] <> BLANK())
+
+Rata-rata Level Tank (mm) =
+CALCULATE(AVERAGE(TankLevelFact[level_mm]), TankLevelFact[no_tanki_normalized] <> BLANK())
+
+Rata-rata Water Content (mm) =
+CALCULATE(AVERAGE(TankLevelFact[water_mm]), TankLevelFact[no_tanki_normalized] <> BLANK())
+
+Total QC =
+COUNTROWS(QCFact)
+
+Rata-rata Density =
+AVERAGE(QCFact[density])
+
+Rata-rata Temperatur =
+AVERAGE(QCFact[temperatur_c])
+
+Total Transfer Request =
+COUNTROWS(TransferRequestFact)
+
+Total Estimasi Transfer (KL) =
+SUM(TransferRequestFact[est_jumlah_kl])

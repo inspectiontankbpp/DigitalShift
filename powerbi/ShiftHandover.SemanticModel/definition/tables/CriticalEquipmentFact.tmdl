@@ -1,0 +1,89 @@
+/// Fakta kondisi critical equipment.
+table CriticalEquipmentFact
+	lineageTag: e8083d24-aae7-4dd7-a6eb-5b1d8a5da8e9
+
+	column handover_id
+		dataType: string
+		isHidden
+		lineageTag: beb3ebbf-592a-4171-ac82-03adf671eb3c
+		sourceColumn: handover_id
+
+	column form_number
+		dataType: string
+		lineageTag: bb8131c8-0632-4db6-97e1-117ff1857537
+		sourceColumn: form_number
+
+	column tanggal_operasional
+		dataType: dateTime
+		lineageTag: c7b68474-29ba-4c63-811d-9769155e3665
+		sourceColumn: tanggal_operasional
+
+	column shift_id
+		dataType: string
+		isHidden
+		lineageTag: 9bd135c0-170f-4bd7-9393-d73e31dea2d8
+		sourceColumn: shift_id
+
+	column shift_name
+		dataType: string
+		isHidden
+		lineageTag: 9827ac93-a153-4c98-84ef-38bcd562407b
+		sourceColumn: shift_name
+
+	column regu_shift
+		dataType: string
+		isHidden
+		lineageTag: dce5efb3-8147-4159-ad44-eafc29250d06
+		sourceColumn: regu_shift
+
+	column operator_id
+		dataType: string
+		isHidden
+		lineageTag: de9d3282-5412-4a23-8a54-9721f1593171
+		sourceColumn: operator_id
+
+	column operator_name
+		dataType: string
+		isHidden
+		lineageTag: beb9c9a4-6fd1-4f5b-a293-ea71ff965303
+		sourceColumn: operator_name
+
+	column kategori
+		dataType: string
+		lineageTag: 9ab05aed-ff93-4cbe-9797-45b1de1b2950
+		sourceColumn: kategori
+
+	column nama_peralatan
+		dataType: string
+		lineageTag: 2c959eb8-a431-4ae0-8712-310c9018ea76
+		sourceColumn: nama_peralatan
+
+	column status
+		dataType: string
+		lineageTag: ba48c230-87b7-4835-8faa-41e8acfecfba
+		sourceColumn: status
+
+	column kondisi
+		dataType: string
+		lineageTag: 777f0754-4c40-4555-a813-bff4812b7b01
+		sourceColumn: kondisi
+
+	column keterangan
+		dataType: string
+		lineageTag: 136711dd-9ba2-4f5f-b47d-c706cb250bae
+		sourceColumn: keterangan
+
+	column is_issue
+		dataType: boolean
+		lineageTag: 3fee2d35-b044-41c0-8348-06c1bb85aade
+		sourceColumn: is_issue
+
+	partition CriticalEquipmentFact = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="critical_equipment_fact"]}[Data]
+				in
+				    Nav
+

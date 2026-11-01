@@ -1,0 +1,35 @@
+/// Model Power BI untuk Digital Shift Handover & Operation Logbook.
+model ShiftHandover
+	defaultMode: directQuery
+	culture: id-ID
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_ProTooling = ["MCP-PBIModeling","DevMode"]
+
+ref table DimDate
+ref table DimOperator
+ref table DimSupervisor
+ref table DimShift
+ref table DimRegu
+ref table DimHandoverStatus
+ref table DimApprovalStatus
+ref table DimActivityStatus
+ref table DimJobStatus
+ref table DimPriority
+ref table DimProduct
+ref table DimTank
+ref table HandoverFact
+ref table ActivityFact
+ref table ApprovalFact
+ref table OutstandingJobFact
+ref table TankLevelFact
+ref table QCFact
+ref table CriticalEquipmentFact
+ref table SafetyToolFact
+ref table TransferRequestFact
+

@@ -1,0 +1,84 @@
+/// Fakta kondisi safety tool.
+table SafetyToolFact
+	lineageTag: da46957f-94d6-4487-a4dd-528ea6e09605
+
+	column handover_id
+		dataType: string
+		isHidden
+		lineageTag: 2363e5e6-5f29-4464-bb91-11e1eeae0717
+		sourceColumn: handover_id
+
+	column form_number
+		dataType: string
+		lineageTag: cfa1a49f-66a8-4aa6-ac7e-c5db6b79c7a0
+		sourceColumn: form_number
+
+	column tanggal_operasional
+		dataType: dateTime
+		lineageTag: 9b750883-1ca1-40d0-9913-49a842afb2aa
+		sourceColumn: tanggal_operasional
+
+	column shift_id
+		dataType: string
+		isHidden
+		lineageTag: 90900565-f87f-4086-bba9-ec7b4d3fa52e
+		sourceColumn: shift_id
+
+	column shift_name
+		dataType: string
+		isHidden
+		lineageTag: b6c7d1a7-e881-4b2e-8bf9-b106c2b461a1
+		sourceColumn: shift_name
+
+	column regu_shift
+		dataType: string
+		isHidden
+		lineageTag: b9866382-26f9-4761-bebb-17da3511b34f
+		sourceColumn: regu_shift
+
+	column operator_id
+		dataType: string
+		isHidden
+		lineageTag: cf5079e7-888f-49eb-a052-76cf78a89f1b
+		sourceColumn: operator_id
+
+	column operator_name
+		dataType: string
+		isHidden
+		lineageTag: 10831cb8-4710-406a-bb7d-dbda5dc34709
+		sourceColumn: operator_name
+
+	column nama
+		dataType: string
+		lineageTag: 6a3f0468-05cc-42eb-9114-5f2e043adb8b
+		sourceColumn: nama
+
+	column status
+		dataType: string
+		lineageTag: 5b680c1e-10a3-40e8-aa2c-bf908e877065
+		sourceColumn: status
+
+	column kondisi
+		dataType: string
+		lineageTag: d3495795-8849-4ec4-abb8-9a638eed002f
+		sourceColumn: kondisi
+
+	column keterangan
+		dataType: string
+		lineageTag: aace30b8-ca00-49ea-a63a-7fc9e153be43
+		sourceColumn: keterangan
+
+	column is_issue
+		dataType: boolean
+		lineageTag: 93a7befa-617f-420c-a639-82341ed11fc5
+		sourceColumn: is_issue
+
+	partition SafetyToolFact = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="safety_tool_fact"]}[Data]
+				in
+				    Nav
+

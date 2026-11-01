@@ -1,0 +1,25 @@
+/// Dimensi produk BBM.
+table DimProduct
+	lineageTag: 04adcba9-d598-48c7-a065-6412fc7228b9
+
+	column produk
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: 9993af54-d141-43cd-be92-4bd9589eb178
+		sourceColumn: produk
+
+	column produk_name
+		dataType: string
+		lineageTag: c87972c7-c458-4200-9678-515e549a8e0d
+		sourceColumn: produk_name
+
+	partition DimProduct = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="dim_product"]}[Data]
+				in
+				    Nav
+

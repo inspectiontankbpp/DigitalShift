@@ -1,0 +1,32 @@
+/// Dimensi regu shift dari data operasional.
+table DimRegu
+	lineageTag: 8f22b472-a8d7-44b7-9796-b4ccbb90aeaf
+
+	column regu_shift
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: 211742d6-ba71-4723-bb15-57a79ba0ddcf
+		sourceColumn: regu_shift
+
+	column regu_name
+		dataType: string
+		lineageTag: 3eede834-6d17-4c9f-954b-4a3eb094b08f
+		sourceColumn: regu_name
+		sortByColumn: regu_sort
+
+	column regu_sort
+		dataType: int64
+		isHidden
+		lineageTag: 096b6e86-03b9-4e30-bf57-3954a5502534
+		sourceColumn: regu_sort
+
+	partition DimRegu = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="dim_regu"]}[Data]
+				in
+				    Nav
+

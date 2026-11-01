@@ -1,0 +1,88 @@
+/// Fakta approval dan keputusan supervisor.
+table ApprovalFact
+	lineageTag: 89e264a3-852d-4c93-89cc-845706e775d5
+
+	column approval_id
+		dataType: string
+		lineageTag: fc1c2494-4c59-402a-9806-77122613a884
+		sourceColumn: approval_id
+
+	column handover_id
+		dataType: string
+		isHidden
+		lineageTag: 9a6417d9-781b-416d-8376-a4e4f1f12b30
+		sourceColumn: handover_id
+
+	column form_number
+		dataType: string
+		lineageTag: cb55495d-b9f2-419c-9fbd-57d4d5821828
+		sourceColumn: form_number
+
+	column tanggal_operasional
+		dataType: dateTime
+		lineageTag: ce37ae64-9ff9-4ec5-ab6c-cf81ebe9a5f5
+		sourceColumn: tanggal_operasional
+
+	column handover_status
+		dataType: string
+		isHidden
+		lineageTag: 6cde314c-2661-4c89-8de0-53d6d120a3c6
+		sourceColumn: handover_status
+
+	column supervisor_id
+		dataType: string
+		isHidden
+		lineageTag: 4f9445a1-9dfe-433a-94eb-4b42aeed9db5
+		sourceColumn: supervisor_id
+
+	column supervisor_name
+		dataType: string
+		isHidden
+		lineageTag: 0ea1d2d8-2ca0-4f55-9c76-8ac82d526966
+		sourceColumn: supervisor_name
+
+	column status
+		dataType: string
+		isHidden
+		lineageTag: d34a8d41-3d56-473a-8d2e-d85859635bf7
+		sourceColumn: status
+
+	column comment
+		dataType: string
+		lineageTag: f6a03194-ed2f-4200-9b8b-455c37d1d4f8
+		sourceColumn: comment
+
+	column created_at
+		dataType: dateTime
+		lineageTag: 3cdab6ab-b655-44db-9a17-4c70dfd3da30
+		sourceColumn: created_at
+
+	column approved_at
+		dataType: dateTime
+		lineageTag: ec61af36-6f63-4272-8eda-55ebab920e4b
+		sourceColumn: approved_at
+
+	column submitted_at
+		dataType: dateTime
+		lineageTag: e909321e-7559-40e8-ba15-b5df38fd5fe4
+		sourceColumn: submitted_at
+
+	column decision_minutes
+		dataType: decimal
+		lineageTag: 58fbd40b-c798-4d94-86e3-6174e48dd61f
+		sourceColumn: decision_minutes
+
+	column approval_sequence
+		dataType: int64
+		lineageTag: 29ec90c3-a3b9-4175-9245-4a481dd45181
+		sourceColumn: approval_sequence
+
+	partition ApprovalFact = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="approval_fact"]}[Data]
+				in
+				    Nav
+

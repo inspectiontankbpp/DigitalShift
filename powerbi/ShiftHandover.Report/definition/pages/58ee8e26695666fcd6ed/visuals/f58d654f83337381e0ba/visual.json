@@ -1,0 +1,172 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "f58d654f83337381e0ba",
+  "position": {
+    "x": 24,
+    "y": 452,
+    "z": 300,
+    "width": 1232,
+    "height": 244,
+    "tabOrder": 4
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "TransferRequestFact"
+                    }
+                  },
+                  "Property": "form_number"
+                }
+              },
+              "queryRef": "TransferRequestFact.form_number",
+              "nativeQueryRef": "No. Form"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimDate"
+                    }
+                  },
+                  "Property": "date"
+                }
+              },
+              "queryRef": "DimDate.date",
+              "nativeQueryRef": "Tanggal"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimShift"
+                    }
+                  },
+                  "Property": "shift_name"
+                }
+              },
+              "queryRef": "DimShift.shift_name",
+              "nativeQueryRef": "Shift"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimProduct"
+                    }
+                  },
+                  "Property": "produk_name"
+                }
+              },
+              "queryRef": "DimProduct.produk_name",
+              "nativeQueryRef": "Produk"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "TransferRequestFact"
+                    }
+                  },
+                  "Property": "no_tangki"
+                }
+              },
+              "queryRef": "TransferRequestFact.no_tangki",
+              "nativeQueryRef": "No. Tangki"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "TransferRequestFact"
+                    }
+                  },
+                  "Property": "est_jumlah_kl"
+                }
+              },
+              "queryRef": "TransferRequestFact.est_jumlah_kl",
+              "nativeQueryRef": "Estimasi (KL)"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "TransferRequestFact"
+                    }
+                  },
+                  "Property": "estimasi_jam"
+                }
+              },
+              "queryRef": "TransferRequestFact.estimasi_jam",
+              "nativeQueryRef": "Estimasi Jam"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "TransferRequestFact"
+                    }
+                  },
+                  "Property": "keterangan"
+                }
+              },
+              "queryRef": "TransferRequestFact.keterangan",
+              "nativeQueryRef": "Keterangan"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Permintaan Transfer'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

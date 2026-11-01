@@ -1,0 +1,35 @@
+/// Dimensi supervisor dan approver.
+table DimSupervisor
+	lineageTag: 1e340253-8dcb-4541-9434-b6112f536861
+
+	column supervisor_id
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: 416c995a-df91-457f-b866-85c34bbad5b6
+		sourceColumn: supervisor_id
+
+	column supervisor_name
+		dataType: string
+		lineageTag: d2e0f1a8-f98b-445a-b73b-a48ce12b45a5
+		sourceColumn: supervisor_name
+
+	column role
+		dataType: string
+		lineageTag: d9702086-d145-4ce7-bb75-7da91d1a2e80
+		sourceColumn: role
+
+	column created_at
+		dataType: dateTime
+		lineageTag: a2e8ce50-bccd-4f28-9f00-68a4099a790c
+		sourceColumn: created_at
+
+	partition DimSupervisor = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="dim_supervisor"]}[Data]
+				in
+				    Nav
+

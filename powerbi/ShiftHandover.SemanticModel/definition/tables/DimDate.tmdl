@@ -1,0 +1,107 @@
+/// Dimensi tanggal untuk analisis waktu dan time intelligence.
+table DimDate
+	lineageTag: 328a18fe-31c3-4264-86fc-87973f0d74be
+	dataCategory: Time
+
+	column date
+		dataType: dateTime
+		isUnique
+		isKey
+		lineageTag: afda0ff9-5b77-4147-b690-1acb5068ed6e
+		sourceColumn: date
+
+	column year
+		dataType: int64
+		lineageTag: 937b2118-ffdd-4b34-aef2-b199e3d32b35
+		sourceColumn: year
+
+	column quarter
+		dataType: int64
+		isHidden
+		lineageTag: b0281d6a-4c3e-47fc-9115-46194039abdf
+		sourceColumn: quarter
+
+	column quarter_name
+		dataType: string
+		lineageTag: 2cabc17d-2442-4541-adb0-b042dd5e7670
+		sourceColumn: quarter_name
+		sortByColumn: quarter
+
+	column month_number
+		dataType: int64
+		isHidden
+		lineageTag: 588ebee2-5c6d-4d10-9540-b9e296dcda49
+		sourceColumn: month_number
+
+	column month_name
+		dataType: string
+		lineageTag: 89701263-1460-4b4b-85d3-98c5c7476414
+		sourceColumn: month_name
+		sortByColumn: month_number
+
+	column month_short
+		dataType: string
+		lineageTag: 5b35f0cb-1a10-4b77-b7fd-9244592f65be
+		sourceColumn: month_short
+		sortByColumn: month_number
+
+	column day_of_month
+		dataType: int64
+		lineageTag: e240c59d-72f7-40d8-a5a4-dd0b500f299c
+		sourceColumn: day_of_month
+
+	column day_of_week
+		dataType: int64
+		isHidden
+		lineageTag: c396a2b7-9244-4eca-8bc7-ba87c3082af3
+		sourceColumn: day_of_week
+
+	column day_name
+		dataType: string
+		lineageTag: 5cc4dc12-59ca-4051-a2aa-e92794ec0172
+		sourceColumn: day_name
+		sortByColumn: day_of_week
+
+	column week_of_year
+		dataType: int64
+		isHidden
+		lineageTag: 1e333d22-453c-404d-8355-1f50f8fb4ebd
+		sourceColumn: week_of_year
+
+	column is_weekend
+		dataType: boolean
+		lineageTag: fc8c7264-a378-4529-af87-13045a2dfd14
+		sourceColumn: is_weekend
+
+	column year_month
+		dataType: string
+		lineageTag: e5db490b-b85f-4f9d-9791-a11194e04553
+		sourceColumn: year_month
+
+	column month_start
+		dataType: dateTime
+		isHidden
+		lineageTag: 536cffc6-8954-47ac-9f50-1c0e40e6957a
+		sourceColumn: month_start
+
+	column quarter_start
+		dataType: dateTime
+		isHidden
+		lineageTag: d2990dc1-4ef3-4f93-ba24-3c6b37010794
+		sourceColumn: quarter_start
+
+	column year_start
+		dataType: dateTime
+		isHidden
+		lineageTag: 389d3cec-6324-40da-8f3d-9d5e3cc27037
+		sourceColumn: year_start
+
+	partition DimDate = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="dim_date"]}[Data]
+				in
+				    Nav
+

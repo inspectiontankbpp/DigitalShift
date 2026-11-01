@@ -1,0 +1,132 @@
+/// Fakta outstanding job.
+table OutstandingJobFact
+	lineageTag: 3ecc2216-b7de-44db-9d04-980bb9ef5e78
+
+	column job_id
+		dataType: string
+		isHidden
+		lineageTag: ec2b7ec7-c3ee-4ee0-9091-485534ebc76d
+		sourceColumn: job_id
+
+	column handover_id
+		dataType: string
+		isHidden
+		lineageTag: 0a00e7d8-b442-4ee5-80c5-3b5fcfba32f3
+		sourceColumn: handover_id
+
+	column form_number
+		dataType: string
+		lineageTag: dcd75060-bdea-4338-99b1-dd68220af36a
+		sourceColumn: form_number
+
+	column tanggal_operasional
+		dataType: dateTime
+		lineageTag: 5097372e-ab19-4068-9bdb-e4995978e892
+		sourceColumn: tanggal_operasional
+
+	column shift_id
+		dataType: string
+		isHidden
+		lineageTag: dfd3a2d1-2490-44f8-aeb6-afe75b8dcfbc
+		sourceColumn: shift_id
+
+	column shift_name
+		dataType: string
+		isHidden
+		lineageTag: da847353-d056-48ed-b68f-c867d230b7d3
+		sourceColumn: shift_name
+
+	column regu_shift
+		dataType: string
+		isHidden
+		lineageTag: e4accafe-f1d0-48b9-aec9-651fa5c85d37
+		sourceColumn: regu_shift
+
+	column operator_id
+		dataType: string
+		isHidden
+		lineageTag: 604d7a17-3f8d-4dad-b1bb-e1f384d85509
+		sourceColumn: operator_id
+
+	column operator_name
+		dataType: string
+		isHidden
+		lineageTag: 3b7ad804-a6a3-4807-ad00-0bea0bb3418b
+		sourceColumn: operator_name
+
+	column judul
+		dataType: string
+		lineageTag: 627c9e29-a2c9-452f-a453-f159ec5f8119
+		sourceColumn: judul
+
+	column deskripsi
+		dataType: string
+		lineageTag: 72121d45-debe-4097-8ac9-762e426905a7
+		sourceColumn: deskripsi
+
+	column prioritas
+		dataType: string
+		isHidden
+		lineageTag: 7c4c9994-871d-4b8d-8b02-751281a18710
+		sourceColumn: prioritas
+
+	column pic
+		dataType: string
+		lineageTag: c34b8e11-ef10-41af-a85a-179678cbad24
+		sourceColumn: pic
+
+	column deadline
+		dataType: dateTime
+		lineageTag: dea6c6fc-0e7e-43a1-9fda-84415f1a4e28
+		sourceColumn: deadline
+
+	column status
+		dataType: string
+		isHidden
+		lineageTag: d9cf9aca-b82c-4156-a902-cfb4c1644259
+		sourceColumn: status
+
+	column created_at
+		dataType: dateTime
+		lineageTag: babfdff4-f3d3-4a28-af02-fe50e4bf619b
+		sourceColumn: created_at
+
+	column updated_at
+		dataType: dateTime
+		lineageTag: 14e7f30c-c86e-4d68-8d23-fd3cdaf1fa8e
+		sourceColumn: updated_at
+
+	column is_open
+		dataType: boolean
+		lineageTag: cf870135-5bca-4398-b6e6-d84e41a1b373
+		sourceColumn: is_open
+
+	column is_completed
+		dataType: boolean
+		lineageTag: 2318066c-b6b2-406c-81ec-3b253ded0b45
+		sourceColumn: is_completed
+
+	column is_cancelled
+		dataType: boolean
+		lineageTag: 6a047094-d9b9-49d2-913c-bdf8f50d9d80
+		sourceColumn: is_cancelled
+
+	column is_overdue
+		dataType: boolean
+		lineageTag: 81548ee2-bf84-4c2a-95c3-98f369fb1b34
+		sourceColumn: is_overdue
+
+	column aging_days
+		dataType: decimal
+		lineageTag: 46d448cf-328b-43e4-b3c8-1e10ff071a9d
+		sourceColumn: aging_days
+
+	partition OutstandingJobFact = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="outstanding_job_fact"]}[Data]
+				in
+				    Nav
+

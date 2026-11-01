@@ -1,0 +1,37 @@
+/// Dimensi status aktivitas.
+table DimActivityStatus
+	lineageTag: e322f7d1-7aec-4de6-a2cc-d70706e1c67a
+
+	column status_code
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: c7d48267-6f23-4936-bd52-5850f64c7246
+		sourceColumn: status_code
+
+	column status_name
+		dataType: string
+		lineageTag: a76bebd0-431f-4cd6-86b9-c24acd674e89
+		sourceColumn: status_name
+		sortByColumn: status_sort
+
+	column status_sort
+		dataType: int64
+		isHidden
+		lineageTag: 08688233-9ea3-4a3f-b358-bf33325de0c4
+		sourceColumn: status_sort
+
+	column is_final
+		dataType: boolean
+		lineageTag: 379339ad-7ff8-40e1-8a60-8e748dc3c9a8
+		sourceColumn: is_final
+
+	partition DimActivityStatus = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="dim_activity_status"]}[Data]
+				in
+				    Nav
+

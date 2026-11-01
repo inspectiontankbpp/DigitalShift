@@ -1,0 +1,31 @@
+/// Dimensi tank ternormalisasi.
+table DimTank
+	lineageTag: ac336a6e-5469-4bdb-be06-47471d9160e4
+
+	column no_tanki_key
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: 8429d64e-f5f7-494e-8d4e-6c275e369be0
+		sourceColumn: no_tanki_key
+
+	column no_tanki_label
+		dataType: string
+		lineageTag: 346b6200-0f4d-4140-8bd8-cdc4acc4f859
+		sourceColumn: no_tanki_label
+
+	column produk
+		dataType: string
+		isHidden
+		lineageTag: e9675ac1-ec18-489a-8a63-2212b8491e23
+		sourceColumn: produk
+
+	partition DimTank = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="dim_tank"]}[Data]
+				in
+				    Nav
+

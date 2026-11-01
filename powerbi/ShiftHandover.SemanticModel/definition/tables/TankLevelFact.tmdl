@@ -1,0 +1,106 @@
+/// Fakta level dan water content tank.
+table TankLevelFact
+	lineageTag: ac45a368-f844-41d7-88c3-dfd4fcf6a7bc
+
+	column handover_id
+		dataType: string
+		isHidden
+		lineageTag: 11707bf6-bac3-42f6-afe7-f8601e6ff66b
+		sourceColumn: handover_id
+
+	column form_number
+		dataType: string
+		lineageTag: f687369b-2e6c-4839-806f-a8e69a9bf533
+		sourceColumn: form_number
+
+	column tanggal_operasional
+		dataType: dateTime
+		lineageTag: d86b7e89-3028-4eb4-86c6-d97792ee6e4e
+		sourceColumn: tanggal_operasional
+
+	column shift_id
+		dataType: string
+		isHidden
+		lineageTag: 68b3b898-2879-46cf-9fb6-c57506b0aece
+		sourceColumn: shift_id
+
+	column shift_name
+		dataType: string
+		isHidden
+		lineageTag: 88ebb821-7fe2-44f0-9d5e-9ac50f9373d9
+		sourceColumn: shift_name
+
+	column regu_shift
+		dataType: string
+		isHidden
+		lineageTag: 85d8e3b6-7990-480a-a8b0-5e49cd9bfaff
+		sourceColumn: regu_shift
+
+	column operator_id
+		dataType: string
+		isHidden
+		lineageTag: 9ce95de2-0ebd-4771-9ded-2d19ff155db7
+		sourceColumn: operator_id
+
+	column operator_name
+		dataType: string
+		isHidden
+		lineageTag: 1241bd06-3f51-44e9-b9f0-b56f19a17008
+		sourceColumn: operator_name
+
+	column jam
+		dataType: string
+		lineageTag: fa90e22c-15e0-41bd-92d4-8c524fdde2a8
+		sourceColumn: jam
+
+	column no_tanki_normalized
+		dataType: string
+		isHidden
+		lineageTag: 5f5588e7-d37e-474e-99be-1ea07f1fed27
+		sourceColumn: no_tanki_normalized
+
+	column no_tanki
+		dataType: string
+		lineageTag: 849699c1-68a7-41d6-82b1-ac92e362f316
+		sourceColumn: no_tanki
+
+	column produk
+		dataType: string
+		isHidden
+		lineageTag: f3c1450b-aab9-4586-9cd1-4a85a31b6fae
+		sourceColumn: produk
+
+	column level_text
+		dataType: string
+		lineageTag: f117079d-cdd4-4851-a52d-957157836ae6
+		sourceColumn: level_text
+
+	column level_mm
+		dataType: decimal
+		lineageTag: fca6632a-9ade-48a4-aa99-cd9dcf178888
+		sourceColumn: level_mm
+
+	column water_text
+		dataType: string
+		lineageTag: 7c18c20c-954a-4386-9b79-ea72cacee75f
+		sourceColumn: water_text
+
+	column water_mm
+		dataType: decimal
+		lineageTag: 93fbd5b7-4e87-49af-8070-079ed8b11acd
+		sourceColumn: water_mm
+
+	column keterangan
+		dataType: string
+		lineageTag: befa725f-4aba-4343-a139-5b55150a27a8
+		sourceColumn: keterangan
+
+	partition TankLevelFact = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="tank_level_fact"]}[Data]
+				in
+				    Nav
+

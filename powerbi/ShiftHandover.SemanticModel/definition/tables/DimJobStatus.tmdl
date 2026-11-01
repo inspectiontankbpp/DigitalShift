@@ -1,0 +1,37 @@
+/// Dimensi status outstanding job.
+table DimJobStatus
+	lineageTag: 11b44595-e623-4512-8c4f-739205f71970
+
+	column status_code
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: bb92cfad-0dea-4ff9-a0f9-39149908a9bd
+		sourceColumn: status_code
+
+	column status_name
+		dataType: string
+		lineageTag: 4049f243-0542-4536-b5b3-9bc6aef1f2c5
+		sourceColumn: status_name
+		sortByColumn: status_sort
+
+	column status_sort
+		dataType: int64
+		isHidden
+		lineageTag: 2eeb6f1a-ebb0-4227-a38d-9f1f2abd7e07
+		sourceColumn: status_sort
+
+	column is_final
+		dataType: boolean
+		lineageTag: dcf77b07-8a03-422e-96cf-f26d8570fe22
+		sourceColumn: is_final
+
+	partition DimJobStatus = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="dim_job_status"]}[Data]
+				in
+				    Nav
+

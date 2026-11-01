@@ -1,0 +1,35 @@
+/// Dimensi operator handover.
+table DimOperator
+	lineageTag: 9fcc49c9-0dfc-473b-8ce6-886c52091a10
+
+	column operator_id
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: b985972d-f611-4c70-bb98-d7ec7e4f96db
+		sourceColumn: operator_id
+
+	column operator_name
+		dataType: string
+		lineageTag: fd852217-fde7-4d5b-8799-8b9707eb97af
+		sourceColumn: operator_name
+
+	column role
+		dataType: string
+		lineageTag: 9d194609-3e91-4034-84a6-b451e489661a
+		sourceColumn: role
+
+	column created_at
+		dataType: dateTime
+		lineageTag: 0ea3303e-ddb2-4307-9171-2b9adc7138ca
+		sourceColumn: created_at
+
+	partition DimOperator = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="dim_operator"]}[Data]
+				in
+				    Nav
+

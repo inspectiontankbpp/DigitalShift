@@ -1,0 +1,35 @@
+/// Dimensi shift master.
+table DimShift
+	lineageTag: 7f644a37-4b5d-4a6c-a3c5-3777d9a4c139
+
+	column shift_id
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: 2da8a5a3-da31-46c4-9b04-aee5a8cb208a
+		sourceColumn: shift_id
+
+	column shift_name
+		dataType: string
+		lineageTag: d06ca02e-00d3-4b63-be37-6048a14c6cfa
+		sourceColumn: shift_name
+
+	column start_time
+		dataType: string
+		lineageTag: 13965715-8226-4994-a1da-78d3f8d4da9a
+		sourceColumn: start_time
+
+	column end_time
+		dataType: string
+		lineageTag: 14ffea9f-522b-44af-a854-9b68965e8b4e
+		sourceColumn: end_time
+
+	partition DimShift = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Nav = Source{[Schema="reporting",Item="dim_shift"]}[Data]
+				in
+				    Nav
+
