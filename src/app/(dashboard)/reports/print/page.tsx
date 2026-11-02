@@ -108,7 +108,7 @@ export default function ReportsPrintPage() {
         <div className="flex items-center justify-between gap-3 mb-4 pb-2">
           <div className="w-24 sm:w-28 shrink-0 flex justify-start">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/pertamina.png" alt="Pertamina" className="max-h-14 sm:max-h-16 object-contain" />
+            <img src="/danantara.png" alt="Danantara" className="max-h-14 sm:max-h-16 object-contain" />
           </div>
           <div className="flex-1 text-center">
             <div className="font-bold text-base sm:text-lg uppercase tracking-wide">Laporan Shift Handover</div>
@@ -116,7 +116,7 @@ export default function ReportsPrintPage() {
           </div>
           <div className="w-24 sm:w-28 shrink-0 flex justify-end">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/danantara.png" alt="Danantara" className="max-h-14 sm:max-h-16 object-contain" />
+            <img src="/pertamina.png" alt="Pertamina" className="max-h-14 sm:max-h-16 object-contain" />
           </div>
         </div>
 

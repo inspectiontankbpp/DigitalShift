@@ -42,15 +42,15 @@ interface Activity {
 }
 
 const REGU_OPTIONS_FALLBACK = [
-  { id: "regu1", name: "Regu 1 / Pagi" },
-  { id: "regu2", name: "Regu 2 / Sore" },
-  { id: "regu3", name: "Regu 3 / Malam" },
+  { id: "regu1", name: "Pagi" },
+  { id: "regu2", name: "Sore" },
+  { id: "regu3", name: "Malam" },
 ]
 
 const SHIFT_TIMES_FALLBACK: Record<string, { label: string }> = {
-  regu1: { label: "08:00 s/d 16:00" },
-  regu2: { label: "16:00 s/d 24:00" },
-  regu3: { label: "00:00 s/d 08:00" },
+  regu1: { label: "06:00 s/d 14:00" },
+  regu2: { label: "16:00 s/d 00:00" },
+  regu3: { label: "22:00 s/d 06:00" },
 }
 
 interface ShiftOption {
@@ -78,8 +78,8 @@ export default function EditHandoverPage() {
   const [submitting, setSubmitting] = useState(false)
 
   const [tanggal, setTanggal] = useState(new Date().toISOString().split("T")[0])
-  const [reguShift, setReguShift] = useState("regu2")
-  const [jamShift, setJamShift] = useState("16:00 s/d 24:00")
+  const [reguShift, setReguShift] = useState("Sore")
+  const [jamShift, setJamShift] = useState("16:00 s/d 00:00")
   const [selectedShift, setSelectedShift] = useState("")
   const [shiftOptions, setShiftOptions] = useState<ShiftOption[]>([])
 
@@ -217,8 +217,9 @@ export default function EditHandoverPage() {
       setJamShift(formatShiftTime(shift.start_time, shift.end_time))
       return
     }
+    const fallback = REGU_OPTIONS_FALLBACK.find((r) => r.id === value)
     const timeInfo = SHIFT_TIMES_FALLBACK[value]
-    setReguShift(value)
+    if (fallback) setReguShift(fallback.name)
     if (timeInfo) setJamShift(timeInfo.label)
   }
 
@@ -467,7 +468,7 @@ export default function EditHandoverPage() {
                   <SelectContent>
                     {shiftOptions.length > 0 ? (
                       shiftOptions.map((s) => (
-                        <SelectItem key={s.id} value={s.id}>{s.name} ({formatShiftTime(s.start_time, s.end_time)})</SelectItem>
+                        <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
                       ))
                     ) : (
                       REGU_OPTIONS_FALLBACK.map((r) => (

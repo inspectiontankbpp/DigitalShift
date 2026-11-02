@@ -41,8 +41,15 @@ export function ShiftHandoverDocument({ handover, activities = [] }: ShiftHandov
   ]
   const formattedDayDate = `${days[dateObj.getDay()]} / ${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`
 
-  const shiftName = opData.reguShift || handover.shifts?.name || "Regu 2 / Sore"
-  const jamShift = opData.jamShift || (handover.shifts ? `${handover.shifts.start_time || ''} s/d ${handover.shifts.end_time || ''}` : "16:00 s/d 24:00")
+  const rawShiftName = opData.reguShift || handover.shifts?.name || "Sore"
+  const shiftName = /pagi|regu\s*1|regu1/i.test(rawShiftName)
+    ? "Pagi"
+    : /malam|regu\s*3|regu3/i.test(rawShiftName)
+      ? "Malam"
+      : /sore|siang|regu\s*2|regu2/i.test(rawShiftName)
+        ? "Sore"
+        : rawShiftName
+  const jamShift = opData.jamShift || (handover.shifts ? `${handover.shifts.start_time || ''} s/d ${handover.shifts.end_time || ''}` : "16:00 s/d 00:00")
 
   const tankLevels = opData.tankLevels || []
   const qcChecks = opData.qcChecks || []
@@ -65,14 +72,14 @@ export function ShiftHandoverDocument({ handover, activities = [] }: ShiftHandov
       <div className="flex items-center justify-between gap-3 mb-4 pb-2">
         <div className="w-24 sm:w-28 shrink-0 flex justify-start">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/pertamina.png" alt="Pertamina" className="max-h-14 sm:max-h-16 object-contain" />
+          <img src="/danantara.png" alt="Danantara" className="max-h-14 sm:max-h-16 object-contain" />
         </div>
         <div className="flex-1 text-center font-bold text-base sm:text-lg uppercase tracking-wide m-0">
           Formulir Serah Terima Shift
         </div>
         <div className="w-24 sm:w-28 shrink-0 flex justify-end">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/danantara.png" alt="Danantara" className="max-h-14 sm:max-h-16 object-contain" />
+          <img src="/pertamina.png" alt="Pertamina" className="max-h-14 sm:max-h-16 object-contain" />
         </div>
       </div>
 
