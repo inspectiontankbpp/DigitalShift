@@ -35,5 +35,5 @@ Panduan integrasi ada di `docs/integrasi-power-bi.md`. Proyek PBIP ada di `power
 ## Catatan
 
 - UI menggunakan Bahasa Indonesia.
-- Aplikasi tidak memiliki service worker/offline support.
+- PWA memakai service worker production-only, cache aset statis, dan halaman offline fallback.
 - File laporan `.pbix` diunduh supervisor dari Supabase Storage private bucket `powerbi` melalui halaman `/powerbi`.

@@ -22,7 +22,7 @@ No tests, CI, or pre-commit hooks. `npm run lint` currently fails on a pre-exist
 - Roles live in `profiles.role` (`operator` | `supervisor`); there is no `users` table in app code.
 - UI primitives are hand-written shadcn-style components in `src/components/ui` (no `components.json` or Radix). Tailwind v4 uses CSS variables in `globals.css`; there is no `tailwind.config.*`. Use `cn` from `@/lib/utils`.
 - `ResponsiveScale` + print CSS keep fixed-width forms readable on mobile and printable. The reports print page auto-triggers `window.print()`; the handover print page only does so with `?auto=true`.
-- PWA is manifest/icons only (`public/manifest.json`); there is no service worker or offline support.
+- PWA uses `public/manifest.json`, `public/sw.js`, and `public/offline.html`. The service worker is registered in production only, caches static assets, and serves an offline fallback for navigation; API/auth/Supabase requests are never cached.
 - Power BI reporting layer: schema `reporting` (9 fact + 12 dimension views) + read-only role `powerbi_reader`; see `docs/integrasi-power-bi.md`. Ready-to-open PBIP/TMDL project is in `powerbi/` (3 pages, 35 visuals, 41 measures). Supervisors download `ShiftHandover.pbix` from Supabase Storage private bucket `powerbi` via `/powerbi`; no binary is committed. Never grant `powerbi_reader` access to `public` tables.
 
 ## Data model
