@@ -118,6 +118,13 @@ powerbi/               Proyek Power BI PBIP/TMDL
 public/                Manifest, service worker, ikon, dan offline page
 ```
 
+## Dokumentasi
+
+- `docs/panduan-developer.md` — panduan onboarding, pengembangan, testing, deployment, dan troubleshooting.
+- `docs/arsitektur-dan-alur-sistem.md` — arsitektur, alur halaman, model data, dan RLS.
+- `docs/integrasi-power-bi.md` — setup schema reporting dan Power BI.
+- `AGENTS.md` — aturan kerja dan gotcha proyek.
+
 ## Deployment
 
 1. Deploy ke Vercel atau platform Next.js lain.

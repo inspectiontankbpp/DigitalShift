@@ -9,7 +9,7 @@ Dokumen ini menggambarkan kondisi sistem yang berjalan saat ini, bukan rencana p
 - Operator hanya dapat mengedit handover miliknya yang berstatus `draft` atau `reopened`.
 - Data operasional utama disimpan di `handovers.operational_data` (JSONB).
 - Log kegiatan disimpan di `handover_activities`.
-- Aplikasi membaca dan menulis langsung ke Supabase; tidak ada API layer, Route Handler, atau Server Action.
+- Aplikasi membaca dan menulis langsung ke Supabase. Satu-satunya Route Handler adalah `/api/powerbi/download` untuk unduhan `.pbix` khusus supervisor.
 - Google Sheets bukan bagian dari sistem yang aktif saat ini.
 
 ## 2. Stack dan Prinsip
@@ -22,7 +22,7 @@ Dokumen ini menggambarkan kondisi sistem yang berjalan saat ini, bukan rencana p
 | Ikon | `lucide-react` |
 | Auth & database | Supabase (Postgres, Auth, Realtime, RLS) |
 | Supabase client | `@supabase/ssr` dan `@supabase/supabase-js` |
-| PWA | `public/manifest.json` + ikon; belum ada service worker/offline |
+| PWA | `public/manifest.json`, `public/sw.js`, `public/offline.html`, dan `src/components/pwa-register.tsx` |
 | Cetak | CSS print + `ResponsiveScale` |
 
 Prinsip utama:
@@ -88,8 +88,11 @@ src/
     supabase/client.ts      Client browser
     supabase/server.ts      Client server
   middleware.ts             Auth & role guard
-supabase/migrations/        Migrasi SQL manual (01–13)
+supabase/migrations/        Migrasi SQL manual (01–16)
 public/manifest.json        Manifest PWA
+public/sw.js                Service worker (production only)
+public/offline.html         Halaman offline fallback
+src/components/pwa-register.tsx  Registrasi service worker
 ```
 
 ## 5. Autentikasi dan Otorisasi
@@ -118,6 +121,7 @@ Role disimpan di `profiles.role`:
 | `/handover` | Ya | Ya |
 | `/approvals` | Ya (hanya handover miliknya) | Ya (semua) |
 | `/reports` | Ya (hanya handover miliknya) | Ya (semua) |
+| `/powerbi` | Tidak (redirect) | Ya |
 | `/settings` | Tidak (redirect) | Ya |
 
 Middleware memblokir operator dari `/dashboard` dan `/settings`. Halaman `/reports` sengaja dibuka untuk operator; pembatasan data dilakukan oleh RLS.
@@ -519,7 +523,7 @@ Halaman `/approvals` juga membuka channel realtime sendiri untuk memuat ulang da
 
 ## 11. PWA, Mobile, dan Cetak
 
-- PWA hanya berupa manifest dan ikon; belum ada service worker, cache, atau mode offline.
+- PWA memakai service worker production-only, cache aset statis, dan halaman offline fallback. Request API, auth, dan Supabase tidak pernah di-cache.
 - `ResponsiveScale` mengecilkan dokumen fixed-width agar tetap terbaca di layar kecil.
 - CSS print menyembunyikan header, tombol, dan elemen non-dokumen.
 - `/reports/print` otomatis membuka dialog print.
@@ -567,6 +571,7 @@ Migrasi berupa file SQL manual di `supabase/migrations/NN_*.sql`. Tidak ada Supa
 | `13` | Operator boleh edit handover `reopened` |
 | `14` | Schema `reporting` + role read-only `powerbi_reader` untuk Power BI |
 | `15` | View dimensi star schema untuk Power BI |
+| `16` | Bucket Storage `powerbi` + policy unduhan supervisor |
 
 ## 13. Batasan dan Catatan Implementasi
 
@@ -579,7 +584,7 @@ Migrasi berupa file SQL manual di `supabase/migrations/NN_*.sql`. Tidak ada Supa
 - `outstanding_jobs` hanya dibaca dashboard; belum ada UI input.
 - `tank_products` belum punya UI admin; perubahan data dilakukan lewat SQL/migrasi.
 - `handover_sync` masih ada di database, tetapi bukan bagian dari alur aktif.
-- Aplikasi belum memiliki mode offline.
+- Mode offline hanya menampilkan halaman fallback; data aplikasi tidak tersedia tanpa jaringan.
 
 ## 14. Sinkronisasi Google Sheets
 
