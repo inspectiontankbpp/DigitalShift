@@ -42,7 +42,7 @@ View di schema `reporting` dimiliki oleh `postgres` dan memakai owner rights. Ar
 
 ## 3. Object Database
 
-Migration: `supabase/migrations/14_powerbi_reporting.sql` dan migration `15_powerbi_dimensions`.
+Migration: `supabase/migrations/14_powerbi_reporting.sql`, `15_powerbi_dimensions.sql`, dan `16_powerbi_storage.sql` (bucket download).
 
 Yang dibuat:
 
@@ -55,34 +55,21 @@ Yang dibuat:
   - hanya `SELECT` ke view `reporting`
 - 9 view fakta + 12 view dimensi.
 
-Jumlah baris saat implementasi:
+Jumlah baris berubah mengikuti data, jadi jangan hardcode di dokumen. Periksa kondisi saat ini dengan:
 
-| View fakta | Baris |
-|---|---:|
-| `reporting.handover_fact` | 11 |
-| `reporting.activity_fact` | 21 |
-| `reporting.approval_fact` | 27 |
-| `reporting.outstanding_job_fact` | 0 |
-| `reporting.tank_level_fact` | 13 |
-| `reporting.qc_fact` | 4 |
-| `reporting.critical_equipment_fact` | 143 |
-| `reporting.safety_tool_fact` | 88 |
-| `reporting.transfer_request_fact` | 4 |
+```sql
+select 'handover_fact' as view_name, count(*) from reporting.handover_fact
+union all select 'activity_fact', count(*) from reporting.activity_fact
+union all select 'approval_fact', count(*) from reporting.approval_fact
+union all select 'outstanding_job_fact', count(*) from reporting.outstanding_job_fact
+union all select 'tank_level_fact', count(*) from reporting.tank_level_fact
+union all select 'qc_fact', count(*) from reporting.qc_fact
+union all select 'critical_equipment_fact', count(*) from reporting.critical_equipment_fact
+union all select 'safety_tool_fact', count(*) from reporting.safety_tool_fact
+union all select 'transfer_request_fact', count(*) from reporting.transfer_request_fact;
+```
 
-| View dimensi | Baris |
-|---|---:|
-| `reporting.dim_date` | 444 |
-| `reporting.dim_operator` | 2 |
-| `reporting.dim_supervisor` | 2 |
-| `reporting.dim_shift` | 4 |
-| `reporting.dim_regu` | 5 |
-| `reporting.dim_handover_status` | 5 |
-| `reporting.dim_approval_status` | 2 |
-| `reporting.dim_activity_status` | 4 |
-| `reporting.dim_job_status` | 4 |
-| `reporting.dim_priority` | 4 |
-| `reporting.dim_product` | 8 |
-| `reporting.dim_tank` | 14 |
+Untuk view dimensi, gunakan `select count(*) from reporting.dim_<nama>;`.
 
 Catatan: `tank_level_fact` dapat berisi baris dengan `no_tanki` kosong jika ada entry tank level kosong di JSON. Untuk visual tank, tambahkan filter `no_tanki is not null`.
 
@@ -124,9 +111,9 @@ Jika muncul `UI is not allowed in this operation`, import lewat .NET `X509Store`
 1. Buka Power BI Desktop.
 2. Pilih **Get Data** → **Database** → **PostgreSQL database**.
 3. Isi:
-   - **Server**: `<project-ref>.pooler.supabase.com`
+   - **Server**: `<pooler-host>` (salin persis dari Dashboard; contoh `aws-0-ap-northeast-1.pooler.supabase.com`)
    - **Database**: `postgres`
-   - Jika dialog meminta port, isi `5432` atau tulis server sebagai `<project-ref>.pooler.supabase.com:5432`.
+   - Jika dialog meminta port, isi `5432` atau tulis server sebagai `<pooler-host>:5432`.
 4. Pilih **DirectQuery**.
 5. Klik **OK**.
 6. Saat diminta kredensial:
@@ -140,13 +127,13 @@ Jika muncul `UI is not allowed in this operation`, import lewat .NET `X509Store`
 
 Direct host `db.<project-ref>.supabase.co` hanya punya record IPv6. Pada jaringan tanpa IPv6, koneksi langsung gagal. Gunakan **Session pooler**:
 
-- Host: `<project-ref>.pooler.supabase.com`
+- Host: `<pooler-host>` (contoh: `aws-0-ap-northeast-1.pooler.supabase.com`)
 - Port: `5432`
 - User: `powerbi_reader.<project-ref>`
 - Database: `postgres`
 - SSL: `require`
 
-Ganti `<project-ref>` dengan project ref Supabase Anda. Jangan commit password atau file kredensial.
+Ganti `<pooler-host>` dengan host session pooler dari Dashboard dan `<project-ref>` dengan project ref Supabase Anda. Jangan commit password atau file kredensial.
 
 Koneksi pooler di atas sudah diuji dan berhasil membaca `reporting.handover_fact`. Jangan memakai **Transaction pooler** (port `6543`) untuk DirectQuery Power BI.
 
@@ -165,7 +152,7 @@ Folder `powerbi/` sudah berisi proyek PBIP yang dibuat untuk schema `reporting`:
 
 Saat pertama membuka, Power BI Desktop akan meminta kredensial PostgreSQL. Gunakan kredensial `powerbi_reader` di atas, lalu refresh. Setelah tampilan sesuai, simpan sebagai `.pbix` untuk dibagikan.
 
-Validasi yang sudah dilakukan: schema PBIP/PBIR 44 file tanpa error, TMDL berhasil di-import dan diekspor ulang oleh Power BI Modeling MCP tanpa perubahan, serta 61 referensi field di 35 visual cocok dengan model.
+Validasi yang sudah dilakukan: struktur PBIP/PBIR berhasil divalidasi tanpa error, TMDL berhasil di-import dan diekspor ulang oleh Power BI Modeling MCP tanpa perubahan, serta referensi field di 35 visual cocok dengan model.
 
 ## 6. Model Data yang Disarankan
 
@@ -366,15 +353,21 @@ alter role powerbi_reader with password '<password-baru>';
 
 ## 13. Catatan Data Quality
 
-Saat implementasi, data masih memiliki beberapa keterbatasan:
+Kualitas insight bergantung pada data yang tersedia. Saat dokumen ini diperbarui, fact view tidak berisi handover, sehingga visual akan kosong sampai operator mengisi handover.
 
-- Semua 11 handover berstatus `approved`.
-- Belum ada komentar approval.
-- Belum ada outstanding job.
-- Hanya 5 handover memiliki data tank level.
-- Hanya 2 handover memiliki data QC.
-- Satuan level tank campuran (`400`, `400 mm`, `7016 mm`).
-- `shift_name` dan `regu_shift` belum selalu konsisten (mis. `Pagi` vs `regu3`).
-- Belum ada data kendala/safety issue/catatan yang terisi.
+Saat data sudah terisi, periksa:
 
-Visual Power BI tetap bisa dibuat, tetapi insight akan terbatas sampai data operasional lebih lengkap.
+- Konsistensi `shift_name` dan `regu_shift` (mis. `Pagi` vs `regu3`).
+- Satuan `level` tank (angka vs `mm`); view sudah menormalkan ke `level_mm`.
+- Entry tank tanpa nomor (`no_tanki` null) — filter untuk visual tank.
+- Kelengkapan QC, komentar approval, outstanding job, kendala, safety issue, dan catatan.
+- Data historis yang dibuat sebelum aturan regu shift diseragamkan.
+
+Untuk audit cepat:
+
+```sql
+select
+  count(*) filter (where no_tanki is null) as tank_tanpa_nomor,
+  count(*) filter (where level_text is not null and level_mm is null) as level_tidak_terbaca
+from reporting.tank_level_fact;
+```

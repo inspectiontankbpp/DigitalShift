@@ -25,7 +25,7 @@ table DimPriority
 		mode: directQuery
 		source =
 				let
-				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Source = PostgreSQL.Database("<pooler-host>:5432", "postgres"),
 				    Nav = Source{[Schema="reporting",Item="dim_priority"]}[Data]
 				in
 				    Nav

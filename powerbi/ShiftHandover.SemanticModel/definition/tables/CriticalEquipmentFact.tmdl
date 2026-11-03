@@ -82,7 +82,7 @@ table CriticalEquipmentFact
 		mode: directQuery
 		source =
 				let
-				    Source = PostgreSQL.Database("<project-ref>.pooler.supabase.com:5432", "postgres"),
+				    Source = PostgreSQL.Database("<pooler-host>:5432", "postgres"),
 				    Nav = Source{[Schema="reporting",Item="critical_equipment_fact"]}[Data]
 				in
 				    Nav

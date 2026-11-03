@@ -93,7 +93,7 @@ Lapisan reporting menggunakan schema `reporting` dan role read-only `powerbi_rea
 - Proyek PBIP/TMDL: `powerbi/`
 - File `.pbix` tidak disimpan di repository.
 - Supervisor mengunduh `ShiftHandover.pbix` dari Supabase Storage private bucket `powerbi` melalui halaman `/powerbi`.
-- Ganti `<project-ref>` pada konfigurasi koneksi dengan project ref Supabase Anda.
+- Ganti `<pooler-host>` dan `<project-ref>` pada konfigurasi koneksi dengan nilai dari Dashboard Supabase Anda.
 - Jangan memberi `powerbi_reader` akses ke tabel `public`.
 
 ## PWA

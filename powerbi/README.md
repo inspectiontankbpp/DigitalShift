@@ -26,13 +26,13 @@ Power BI Desktop memvalidasi sertifikat PostgreSQL. Supabase memakai CA self-sig
 2. Install CA Supabase seperti pada bagian **Prasyarat TLS**.
 3. Buka `ShiftHandover.pbip`.
 4. Saat diminta kredensial PostgreSQL, gunakan:
-   - Server: `<project-ref>.pooler.supabase.com`
+   - Server: `<pooler-host>` (contoh: `aws-0-ap-northeast-1.pooler.supabase.com`)
    - Port: `5432`
    - Database: `postgres`
    - User: `powerbi_reader.<project-ref>`
    - Password: dari password manager.
 5. Pastikan mode koneksi DirectQuery dan schema `reporting`.
-6. Ganti `<project-ref>` dengan project ref Supabase Anda. Jangan simpan password di repo.
+6. Ganti `<pooler-host>` dengan host session pooler dari Dashboard dan `<project-ref>` dengan project ref Supabase Anda. Jangan simpan password di repo.
 7. Refresh, cek visual, lalu simpan sebagai `.pbix` di OneDrive/SharePoint.
 
 Untuk menu download di aplikasi, unggah file ke Supabase Storage private bucket `powerbi` dengan nama `ShiftHandover.pbix`. Route `/api/powerbi/download` mengambil file dari Storage dan hanya mengizinkan supervisor.
