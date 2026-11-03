@@ -253,7 +253,19 @@ export default function ApprovalsPage() {
           </Card>
         ) : (
           currentHandovers.map((handover) => (
-            <Card key={handover.id} className="p-3 sm:p-4">
+            <Card
+              key={handover.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => router.push(`/handover/${handover.id}`)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault()
+                  router.push(`/handover/${handover.id}`)
+                }
+              }}
+              className="p-3 sm:p-4 cursor-pointer transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -300,17 +312,22 @@ export default function ApprovalsPage() {
                 </div>
               </div>
 
-              {isSupervisor && (
-                <div className="flex items-center gap-2 mt-3 pt-3 border-t flex-wrap">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => router.push(`/handover/${handover.id}`)}
-                  >
-                    <FileText className="h-3.5 w-3.5 mr-1" />
-                    Detail
-                  </Button>
+              <div
+                className="flex items-center gap-2 mt-3 pt-3 border-t flex-wrap"
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+              >
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push(`/handover/${handover.id}`)}
+                >
+                  <FileText className="h-3.5 w-3.5 mr-1" />
+                  Detail
+                </Button>
 
+                {isSupervisor && (
+                  <>
                   {activeTab === "review" && (
                     <>
                       <Button
@@ -385,8 +402,9 @@ export default function ApprovalsPage() {
                       </Button>
                     </>
                   )}
-                </div>
-              )}
+                  </>
+                )}
+              </div>
             </Card>
           ))
         )}

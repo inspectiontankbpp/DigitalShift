@@ -15,6 +15,15 @@ interface SelectContextType {
 
 const SelectContext = React.createContext<SelectContextType | null>(null)
 
+function getNodeText(node: React.ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node)
+  if (Array.isArray(node)) return node.map(getNodeText).join("")
+  if (React.isValidElement(node)) {
+    return getNodeText((node.props as { children?: React.ReactNode }).children)
+  }
+  return ""
+}
+
 interface SelectProps {
   value: string
   onValueChange: (value: string) => void
@@ -103,12 +112,14 @@ export function SelectItem({ value, children, className, ...props }: SelectItemP
   const context = React.useContext(SelectContext)
   if (!context) throw new Error("SelectItem must be used within Select")
 
+  const label = getNodeText(children) || value
+
   useEffect(() => {
     if (context.value === value) {
-      context.setDisplayLabel(typeof children === "string" ? children : value)
+      context.setDisplayLabel(label)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [context.value, value])
+  }, [context.value, value, label])
 
   return (
     <div
@@ -119,7 +130,7 @@ export function SelectItem({ value, children, className, ...props }: SelectItemP
       data-selected={context.value === value}
       onClick={() => {
         context.onValueChange(value)
-        context.setDisplayLabel(typeof children === "string" ? children : value)
+        context.setDisplayLabel(label)
         context.setOpen(false)
       }}
       {...props}

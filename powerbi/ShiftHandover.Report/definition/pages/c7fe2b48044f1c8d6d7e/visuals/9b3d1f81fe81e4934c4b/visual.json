@@ -1,0 +1,232 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "9b3d1f81fe81e4934c4b",
+  "position": {
+    "x": 24,
+    "y": 518,
+    "z": 300,
+    "height": 178,
+    "width": 1232,
+    "tabOrder": 4
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "HandoverFact"
+                    }
+                  },
+                  "Property": "form_number"
+                }
+              },
+              "queryRef": "HandoverFact.form_number",
+              "nativeQueryRef": "No. Form"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimDate"
+                    }
+                  },
+                  "Property": "date"
+                }
+              },
+              "queryRef": "DimDate.date",
+              "nativeQueryRef": "Tanggal"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimShift"
+                    }
+                  },
+                  "Property": "shift_name"
+                }
+              },
+              "queryRef": "DimShift.shift_name",
+              "nativeQueryRef": "Shift"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimOperator"
+                    }
+                  },
+                  "Property": "operator_name"
+                }
+              },
+              "queryRef": "DimOperator.operator_name",
+              "nativeQueryRef": "Operator"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimHandoverStatus"
+                    }
+                  },
+                  "Property": "status_name"
+                }
+              },
+              "queryRef": "DimHandoverStatus.status_name",
+              "nativeQueryRef": "Status"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "HandoverFact"
+                    }
+                  },
+                  "Property": "Data Completeness"
+                }
+              },
+              "queryRef": "HandoverFact.Data Completeness",
+              "nativeQueryRef": "Kelengkapan"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Handover Terbaru'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "e358e110cec71600810a",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "HandoverFact"
+              }
+            },
+            "Property": "form_number"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "24f149530ddeb49abaa9",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimDate"
+              }
+            },
+            "Property": "date"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "1ae65510293e0a02894d",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimShift"
+              }
+            },
+            "Property": "shift_name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "af413e2b05607366401c",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimOperator"
+              }
+            },
+            "Property": "operator_name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "97c8facc8152cd1c2041",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "DimHandoverStatus"
+              }
+            },
+            "Property": "status_name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "2d3a6fb83d49357ecabd",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "HandoverFact"
+              }
+            },
+            "Property": "Data Completeness"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

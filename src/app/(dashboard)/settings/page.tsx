@@ -102,9 +102,17 @@ export default function SettingsPage() {
       const { error } = await supabase.from(table).delete().eq("id", id)
       if (error) throw error
       applyData(type, await getTableData(type))
+      toast.success("Data berhasil dihapus.")
     } catch (error) {
       console.error("Error:", error)
-      toast.error("Gagal menghapus data.")
+      const msg = (error as { message?: string })?.message || ""
+      if (msg.includes("row-level security") || msg.includes("permission")) {
+        toast.error("Tidak punya izin menghapus data ini.")
+      } else if (msg.includes("violates foreign key")) {
+        toast.error("Data ini masih dipakai oleh handover lain dan tidak bisa dihapus.")
+      } else {
+        toast.error(msg || "Gagal menghapus data.")
+      }
     } finally {
       setSaving(false)
     }

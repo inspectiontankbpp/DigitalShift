@@ -17,7 +17,7 @@ export default function HandoverDetailPage() {
   const router = useRouter()
   const toast = useToast()
   const { confirm } = useConfirm()
-  const { profile } = useUser()
+  const { user, profile } = useUser()
   const supabase = createClient()
   const isSupervisor = profile?.role === "supervisor"
   const [loading, setLoading] = useState(true)
@@ -118,9 +118,9 @@ export default function HandoverDetailPage() {
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <FileText className="h-12 w-12 text-muted-foreground mb-4 opacity-50" />
         <h2 className="text-lg font-semibold">Handover not found</h2>
-        <Button variant="outline" onClick={() => router.push("/dashboard")} className="mt-4">
+        <Button variant="outline" onClick={() => router.push(isSupervisor ? "/dashboard" : "/handover")} className="mt-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Dashboard
+          {isSupervisor ? "Back to Dashboard" : "Back to Handover"}
         </Button>
       </div>
     )
@@ -129,7 +129,7 @@ export default function HandoverDetailPage() {
   return (
     <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-        <Button variant="outline" size="icon" onClick={() => router.push("/dashboard")} className="shrink-0 self-start">
+        <Button variant="outline" size="icon" onClick={() => router.push(isSupervisor ? "/dashboard" : "/handover")} className="shrink-0 self-start">
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1 min-w-0">
@@ -148,7 +148,9 @@ export default function HandoverDetailPage() {
             <span className="hidden sm:inline">Cetak PDF</span>
             <span className="sm:hidden">Cetak</span>
           </Button>
-          {handover && String(handover.status || "") === "draft" && (
+          {handover
+            && ["draft", "reopened"].includes(String(handover.status || ""))
+            && (isSupervisor || String(handover.operator_id || "") === String(user?.id || "")) && (
             <Button size="sm" onClick={() => router.push(`/handover/${params.id}/edit`)}>
               <Edit className="h-4 w-4 mr-1" />
               Edit

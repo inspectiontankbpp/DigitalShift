@@ -1,0 +1,180 @@
+relationship HandoverFact_tanggal_operasional_DimDate
+	fromColumn: HandoverFact.tanggal_operasional
+	toColumn: DimDate.date
+
+relationship HandoverFact_shift_id_DimShift
+	fromColumn: HandoverFact.shift_id
+	toColumn: DimShift.shift_id
+
+relationship HandoverFact_operator_id_DimOperator
+	fromColumn: HandoverFact.operator_id
+	toColumn: DimOperator.operator_id
+
+relationship HandoverFact_regu_shift_DimRegu
+	fromColumn: HandoverFact.regu_shift
+	toColumn: DimRegu.regu_shift
+
+relationship ActivityFact_tanggal_operasional_DimDate
+	fromColumn: ActivityFact.tanggal_operasional
+	toColumn: DimDate.date
+
+relationship ActivityFact_shift_id_DimShift
+	fromColumn: ActivityFact.shift_id
+	toColumn: DimShift.shift_id
+
+relationship ActivityFact_operator_id_DimOperator
+	fromColumn: ActivityFact.operator_id
+	toColumn: DimOperator.operator_id
+
+relationship ActivityFact_regu_shift_DimRegu
+	fromColumn: ActivityFact.regu_shift
+	toColumn: DimRegu.regu_shift
+
+relationship ApprovalFact_tanggal_operasional_DimDate
+	fromColumn: ApprovalFact.tanggal_operasional
+	toColumn: DimDate.date
+
+relationship OutstandingJobFact_tanggal_operasional_DimDate
+	fromColumn: OutstandingJobFact.tanggal_operasional
+	toColumn: DimDate.date
+
+relationship OutstandingJobFact_shift_id_DimShift
+	fromColumn: OutstandingJobFact.shift_id
+	toColumn: DimShift.shift_id
+
+relationship OutstandingJobFact_operator_id_DimOperator
+	fromColumn: OutstandingJobFact.operator_id
+	toColumn: DimOperator.operator_id
+
+relationship OutstandingJobFact_regu_shift_DimRegu
+	fromColumn: OutstandingJobFact.regu_shift
+	toColumn: DimRegu.regu_shift
+
+relationship TankLevelFact_tanggal_operasional_DimDate
+	fromColumn: TankLevelFact.tanggal_operasional
+	toColumn: DimDate.date
+
+relationship TankLevelFact_shift_id_DimShift
+	fromColumn: TankLevelFact.shift_id
+	toColumn: DimShift.shift_id
+
+relationship TankLevelFact_operator_id_DimOperator
+	fromColumn: TankLevelFact.operator_id
+	toColumn: DimOperator.operator_id
+
+relationship TankLevelFact_regu_shift_DimRegu
+	fromColumn: TankLevelFact.regu_shift
+	toColumn: DimRegu.regu_shift
+
+relationship QCFact_tanggal_operasional_DimDate
+	fromColumn: QCFact.tanggal_operasional
+	toColumn: DimDate.date
+
+relationship QCFact_shift_id_DimShift
+	fromColumn: QCFact.shift_id
+	toColumn: DimShift.shift_id
+
+relationship QCFact_operator_id_DimOperator
+	fromColumn: QCFact.operator_id
+	toColumn: DimOperator.operator_id
+
+relationship QCFact_regu_shift_DimRegu
+	fromColumn: QCFact.regu_shift
+	toColumn: DimRegu.regu_shift
+
+relationship CriticalEquipmentFact_tanggal_operasional_DimDate
+	fromColumn: CriticalEquipmentFact.tanggal_operasional
+	toColumn: DimDate.date
+
+relationship CriticalEquipmentFact_shift_id_DimShift
+	fromColumn: CriticalEquipmentFact.shift_id
+	toColumn: DimShift.shift_id
+
+relationship CriticalEquipmentFact_operator_id_DimOperator
+	fromColumn: CriticalEquipmentFact.operator_id
+	toColumn: DimOperator.operator_id
+
+relationship CriticalEquipmentFact_regu_shift_DimRegu
+	fromColumn: CriticalEquipmentFact.regu_shift
+	toColumn: DimRegu.regu_shift
+
+relationship SafetyToolFact_tanggal_operasional_DimDate
+	fromColumn: SafetyToolFact.tanggal_operasional
+	toColumn: DimDate.date
+
+relationship SafetyToolFact_shift_id_DimShift
+	fromColumn: SafetyToolFact.shift_id
+	toColumn: DimShift.shift_id
+
+relationship SafetyToolFact_operator_id_DimOperator
+	fromColumn: SafetyToolFact.operator_id
+	toColumn: DimOperator.operator_id
+
+relationship SafetyToolFact_regu_shift_DimRegu
+	fromColumn: SafetyToolFact.regu_shift
+	toColumn: DimRegu.regu_shift
+
+relationship TransferRequestFact_tanggal_operasional_DimDate
+	fromColumn: TransferRequestFact.tanggal_operasional
+	toColumn: DimDate.date
+
+relationship TransferRequestFact_shift_id_DimShift
+	fromColumn: TransferRequestFact.shift_id
+	toColumn: DimShift.shift_id
+
+relationship TransferRequestFact_operator_id_DimOperator
+	fromColumn: TransferRequestFact.operator_id
+	toColumn: DimOperator.operator_id
+
+relationship TransferRequestFact_regu_shift_DimRegu
+	fromColumn: TransferRequestFact.regu_shift
+	toColumn: DimRegu.regu_shift
+
+relationship HandoverFact_supervisor_id_DimSupervisor
+	fromColumn: HandoverFact.supervisor_id
+	toColumn: DimSupervisor.supervisor_id
+
+relationship HandoverFact_status_DimHandoverStatus
+	fromColumn: HandoverFact.status
+	toColumn: DimHandoverStatus.status_code
+
+relationship ActivityFact_handover_status_DimHandoverStatus_handover
+	fromColumn: ActivityFact.handover_status
+	toColumn: DimHandoverStatus.status_code
+
+relationship ActivityFact_status_DimActivityStatus
+	fromColumn: ActivityFact.status
+	toColumn: DimActivityStatus.status_code
+
+relationship ApprovalFact_supervisor_id_DimSupervisor
+	fromColumn: ApprovalFact.supervisor_id
+	toColumn: DimSupervisor.supervisor_id
+
+relationship ApprovalFact_handover_status_DimHandoverStatus_handover
+	fromColumn: ApprovalFact.handover_status
+	toColumn: DimHandoverStatus.status_code
+
+relationship ApprovalFact_status_DimApprovalStatus
+	fromColumn: ApprovalFact.status
+	toColumn: DimApprovalStatus.status_code
+
+relationship OutstandingJobFact_status_DimJobStatus
+	fromColumn: OutstandingJobFact.status
+	toColumn: DimJobStatus.status_code
+
+relationship OutstandingJobFact_prioritas_DimPriority
+	fromColumn: OutstandingJobFact.prioritas
+	toColumn: DimPriority.priority_code
+
+relationship TankLevelFact_produk_DimProduct
+	fromColumn: TankLevelFact.produk
+	toColumn: DimProduct.produk
+
+relationship TankLevelFact_no_tanki_normalized_DimTank
+	fromColumn: TankLevelFact.no_tanki_normalized
+	toColumn: DimTank.no_tanki_key
+
+relationship TransferRequestFact_nama_produk_DimProduct_transfer
+	fromColumn: TransferRequestFact.nama_produk
+	toColumn: DimProduct.produk
+

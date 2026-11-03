@@ -22,7 +22,11 @@ import { ResponsiveScale } from "@/components/responsive-scale"
 import {
   DEFAULT_SAFETY_TOOLS,
   DEFAULT_CRITICAL_EQUIPMENT,
+  getCurrentTimeValue,
+  getTankProduct,
+  normalizeActivityTime,
   TankLevel,
+  TankProduct,
   QCCheck,
   CriticalEquipment,
   SafetyTool,
@@ -38,16 +42,29 @@ interface Activity {
   subs: string[]
 }
 
-const REGU_OPTIONS = [
-  { id: "regu1", name: "Regu 1 / Pagi" },
-  { id: "regu2", name: "Regu 2 / Sore" },
-  { id: "regu3", name: "Regu 3 / Malam" },
+const REGU_OPTIONS_FALLBACK = [
+  { id: "regu1", name: "Pagi" },
+  { id: "regu2", name: "Sore" },
+  { id: "regu3", name: "Malam" },
 ]
 
-const SHIFT_TIMES: Record<string, { label: string; start: string; end: string }> = {
-  regu1: { label: "08:00 s/d 16:00", start: "08:00", end: "16:00" },
-  regu2: { label: "16:00 s/d 24:00", start: "16:00", end: "24:00" },
-  regu3: { label: "00:00 s/d 08:00", start: "00:00", end: "08:00" },
+const SHIFT_TIMES_FALLBACK: Record<string, { label: string; start: string; end: string }> = {
+  regu1: { label: "06:00 s/d 14:00", start: "06:00", end: "14:00" },
+  regu2: { label: "16:00 s/d 00:00", start: "16:00", end: "00:00" },
+  regu3: { label: "22:00 s/d 06:00", start: "22:00", end: "06:00" },
+}
+
+interface ShiftOption {
+  id: string
+  name: string
+  start_time: string
+  end_time: string
+}
+
+function formatShiftTime(start: string, end: string) {
+  const s = (start || "").slice(0, 5)
+  const e = (end || "").slice(0, 5)
+  return `${s} s/d ${e}`
 }
 
 export default function HandoverFormPage() {
@@ -57,16 +74,18 @@ export default function HandoverFormPage() {
   const supabase = createClient()
 
   const [selectedShift, setSelectedShift] = useState("")
+  const [shiftOptions, setShiftOptions] = useState<ShiftOption[]>([])
   const [tanggal] = useState(new Date().toISOString().split("T")[0])
   const [kondisiOperasional] = useState("normal")
   const [submitting, setSubmitting] = useState(false)
   const [pendingHandover, setPendingHandover] = useState<{ id: string; form_number: string; status: string } | null>(null)
   const submittingRef = useRef(false)
 
-  const [reguShift, setReguShift] = useState("regu2")
-  const [jamShift, setJamShift] = useState("16:00 s/d 24:00")
+  const [reguShift, setReguShift] = useState("Sore")
+  const [jamShift, setJamShift] = useState("16:00 s/d 00:00")
 
   const [tankLevels, setTankLevels] = useState<TankLevel[]>([])
+  const [tankProducts, setTankProducts] = useState<TankProduct[]>([])
 
   const [qcChecks, setQcChecks] = useState<QCCheck[]>([])
 
@@ -90,7 +109,20 @@ export default function HandoverFormPage() {
         .select("*")
         .eq("is_active", true)
         .order("start_time")
-      if (shiftsData && shiftsData.length > 0) setSelectedShift(shiftsData[0].id)
+      if (shiftsData && shiftsData.length > 0) {
+        setShiftOptions(shiftsData as ShiftOption[])
+        const first = shiftsData[0] as ShiftOption
+        setSelectedShift(first.id)
+        setReguShift(first.name)
+        setJamShift(formatShiftTime(first.start_time, first.end_time))
+      }
+
+      const { data: tankProductsData } = await supabase
+        .from("tank_products")
+        .select("no_tanki, produk")
+        .eq("is_active", true)
+        .order("sort_order")
+      if (tankProductsData) setTankProducts(tankProductsData as TankProduct[])
 
       if (!user?.id) return
       const { data: latestData } = await supabase
@@ -107,7 +139,7 @@ export default function HandoverFormPage() {
   }, [supabase, user?.id])
 
   const addActivity = () => {
-    setActivities([...activities, { waktu: "", aktivitas: "", subs: [""] }])
+    setActivities([...activities, { waktu: getCurrentTimeValue(), aktivitas: "", subs: [""] }])
   }
 
   const removeActivity = (index: number) => {
@@ -141,12 +173,22 @@ export default function HandoverFormPage() {
   }
 
   const addTankLevel = () => {
-    setTankLevels([...tankLevels, { jam: "", produk: "", noTanki: "", level: "", water: "", keterangan: "" }])
+    setTankLevels([...tankLevels, { jam: getCurrentTimeValue(), produk: "", noTanki: "", level: "", water: "", keterangan: "" }])
   }
 
   const updateTankLevel = (idx: number, field: keyof TankLevel, value: string) => {
     const updated = [...tankLevels]
     updated[idx] = { ...updated[idx], [field]: value }
+    setTankLevels(updated)
+  }
+
+  const updateTankNumber = (idx: number, value: string) => {
+    const updated = [...tankLevels]
+    updated[idx] = {
+      ...updated[idx],
+      noTanki: value,
+      produk: value ? getTankProduct(tankProducts, value) || updated[idx].produk : "",
+    }
     setTankLevels(updated)
   }
 
@@ -206,16 +248,32 @@ export default function HandoverFormPage() {
     setTransferRequests(updated)
   }
 
+  const updateTransferTankNumber = (idx: number, value: string) => {
+    const updated = [...transferRequests]
+    updated[idx] = {
+      ...updated[idx],
+      noTangki: value,
+      namaProduk: value ? getTankProduct(tankProducts, value) || updated[idx].namaProduk : "",
+    }
+    setTransferRequests(updated)
+  }
+
   const removeTransferRequest = (idx: number) => {
     setTransferRequests(transferRequests.filter((_, i) => i !== idx))
   }
 
   const handleReguChange = (value: string) => {
-    setReguShift(value)
-    const timeInfo = SHIFT_TIMES[value]
-    if (timeInfo) {
-      setJamShift(timeInfo.label)
+    const shift = shiftOptions.find((s) => s.id === value)
+    if (!shift) {
+      const fallback = REGU_OPTIONS_FALLBACK.find((r) => r.id === value)
+      const timeInfo = SHIFT_TIMES_FALLBACK[value]
+      if (fallback) setReguShift(fallback.name)
+      if (timeInfo) setJamShift(timeInfo.label)
+      return
     }
+    setSelectedShift(shift.id)
+    setReguShift(shift.name)
+    setJamShift(formatShiftTime(shift.start_time, shift.end_time))
   }
 
   const generateFormNumber = () => {
@@ -248,6 +306,7 @@ export default function HandoverFormPage() {
       const formNumber = generateFormNumber()
       const operationalData: OperationalData = {
         reguShift,
+        shiftName: reguShift,
         jamShift,
         tankLevels,
         qcChecks,
@@ -265,9 +324,9 @@ export default function HandoverFormPage() {
           shift_id: selectedShift,
           operator_id: user.id,
           kondisi_operasional: kondisiOperasional,
-          status,
+          status: "draft",
           operational_data: operationalData as unknown as Record<string, unknown>,
-          submitted_at: status === "submitted" ? new Date().toISOString() : null,
+          submitted_at: null,
         })
         .select()
         .single()
@@ -281,23 +340,44 @@ export default function HandoverFormPage() {
 
       const handoverId = handover.id
 
-      for (const activity of activities.filter((a) => a.waktu && a.aktivitas)) {
-        const fullDetail = [activity.aktivitas, ...activity.subs.filter(Boolean)].join(". ")
-        await supabase.from("handover_activities").insert({
+      const activityRows = activities
+        .filter((a) => a.aktivitas.trim() || a.subs.some((sub) => sub.trim()))
+        .map((activity) => ({
           handover_id: handoverId,
-          waktu: activity.waktu,
+          waktu: normalizeActivityTime(activity.waktu),
           aktivitas: activity.aktivitas,
-          deskripsi: fullDetail,
+          deskripsi: [activity.aktivitas, ...activity.subs]
+            .map((item) => item.trim())
+            .filter(Boolean)
+            .join(". "),
           status: "completed",
-        })
+        }))
+
+      if (activityRows.length > 0) {
+        const { error: activityError } = await supabase
+          .from("handover_activities")
+          .insert(activityRows)
+        if (activityError) {
+          await supabase.from("handovers").delete().eq("id", handoverId)
+          throw activityError
+        }
       }
 
       if (status === "submitted") {
+        const { error: submitError } = await supabase
+          .from("handovers")
+          .update({ status: "submitted", submitted_at: new Date().toISOString() })
+          .eq("id", handoverId)
+        if (submitError) {
+          await supabase.from("handovers").delete().eq("id", handoverId)
+          throw submitError
+        }
+
         toast.success("Handover berhasil disubmit!")
         router.push(`/handover/${handoverId}`)
       } else {
         toast.success("Draft berhasil disimpan!")
-        router.push("/dashboard")
+        router.push(`/handover/${handoverId}`)
       }
     } catch (error: unknown) {
       const err = error as { message?: string; details?: string; hint?: string; code?: string }
@@ -363,16 +443,24 @@ export default function HandoverFormPage() {
               </div>
               <div className="space-y-1">
                 <Label htmlFor="reguShift">Regu Shift</Label>
-                <Select value={reguShift} onValueChange={handleReguChange}>
+                <Select value={selectedShift} onValueChange={handleReguChange}>
                   <SelectTrigger>
                     <SelectValue placeholder="Pilih regu" />
                   </SelectTrigger>
                   <SelectContent>
-                    {REGU_OPTIONS.map((r) => (
-                      <SelectItem key={r.id} value={r.id}>
-                        {r.name}
-                      </SelectItem>
-                    ))}
+                    {shiftOptions.length > 0 ? (
+                      shiftOptions.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.name}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      REGU_OPTIONS_FALLBACK.map((r) => (
+                        <SelectItem key={r.id} value={r.id}>
+                          {r.name}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -401,9 +489,11 @@ export default function HandoverFormPage() {
               {activities.map((activity, index) => (
                 <div key={index} className="space-y-1.5 p-3 rounded-lg border bg-muted/10">
                   <div className="flex gap-2 items-start">
-                    <div className="w-16 sm:w-20 shrink-0">
+                    <div className="w-24 sm:w-28 shrink-0">
                       <Input
-                        placeholder="16:01"
+                        type="time"
+                        step="60"
+                        aria-label="Jam aktivitas"
                         value={activity.waktu}
                         onChange={(e) => updateActivity(index, "waktu", e.target.value)}
                         className="h-8 text-xs"
@@ -501,9 +591,35 @@ export default function HandoverFormPage() {
                 <tbody>
                   {tankLevels.map((row, idx) => (
                     <tr key={idx}>
-                      <td className="border px-1 py-1"><Input className="h-7 text-xs" value={row.jam} onChange={(e) => updateTankLevel(idx, "jam", e.target.value)} placeholder="18:50" /></td>
-                      <td className="border px-1 py-1"><Input className="h-7 text-xs" value={row.produk} onChange={(e) => updateTankLevel(idx, "produk", e.target.value)} placeholder="PERTAMAX" /></td>
-                      <td className="border px-1 py-1"><Input className="h-7 text-xs" value={row.noTanki} onChange={(e) => updateTankLevel(idx, "noTanki", e.target.value)} placeholder="T-3 (A-24)" /></td>
+                      <td className="border px-1 py-1">
+                        <Input
+                          type="time"
+                          step="60"
+                          aria-label="Jam pengukuran"
+                          className="h-7 text-xs"
+                          value={row.jam}
+                          onChange={(e) => updateTankLevel(idx, "jam", e.target.value)}
+                        />
+                      </td>
+                      <td className="border px-1 py-1"><Input className="h-7 text-xs" value={row.produk} onChange={(e) => updateTankLevel(idx, "produk", e.target.value)} placeholder="Otomatis" /></td>
+                      <td className="border px-1 py-1">
+                        <select
+                          aria-label="No. Tangki"
+                          className="h-7 w-full rounded-md border border-input bg-background px-1 text-xs"
+                          value={row.noTanki}
+                          onChange={(e) => updateTankNumber(idx, e.target.value)}
+                        >
+                          <option value="">Pilih</option>
+                          {tankProducts.map((product) => (
+                            <option key={product.no_tanki} value={product.no_tanki}>
+                              {product.no_tanki}
+                            </option>
+                          ))}
+                          {row.noTanki && !tankProducts.some((product) => product.no_tanki === row.noTanki) && (
+                            <option value={row.noTanki}>{row.noTanki}</option>
+                          )}
+                        </select>
+                      </td>
                       <td className="border px-1 py-1"><Input className="h-7 text-xs" value={row.level} onChange={(e) => updateTankLevel(idx, "level", e.target.value)} placeholder="400 mm" /></td>
                       <td className="border px-1 py-1"><Input className="h-7 text-xs" value={row.water} onChange={(e) => updateTankLevel(idx, "water", e.target.value)} placeholder="0 mm" /></td>
                       <td className="border px-1 py-1"><Input className="h-7 text-xs" value={row.keterangan} onChange={(e) => updateTankLevel(idx, "keterangan", e.target.value)} placeholder="Temp 28.75°C" /></td>
@@ -747,10 +863,36 @@ export default function HandoverFormPage() {
                 <tbody>
                   {transferRequests.map((req, idx) => (
                     <tr key={idx}>
-                      <td className="border px-1 py-1"><Input className="h-7 text-xs" value={req.noTangki} onChange={(e) => updateTransferRequest(idx, "noTangki", e.target.value)} placeholder="5" /></td>
-                      <td className="border px-1 py-1"><Input className="h-7 text-xs" value={req.namaProduk} onChange={(e) => updateTransferRequest(idx, "namaProduk", e.target.value)} placeholder="PERTADEX" /></td>
+                      <td className="border px-1 py-1">
+                        <select
+                          aria-label="No. Tangki"
+                          className="h-7 w-full rounded-md border border-input bg-background px-1 text-xs"
+                          value={req.noTangki}
+                          onChange={(e) => updateTransferTankNumber(idx, e.target.value)}
+                        >
+                          <option value="">Pilih</option>
+                          {tankProducts.map((product) => (
+                            <option key={product.no_tanki} value={product.no_tanki}>
+                              {product.no_tanki}
+                            </option>
+                          ))}
+                          {req.noTangki && !tankProducts.some((product) => product.no_tanki === req.noTangki) && (
+                            <option value={req.noTangki}>{req.noTangki}</option>
+                          )}
+                        </select>
+                      </td>
+                      <td className="border px-1 py-1"><Input className="h-7 text-xs" value={req.namaProduk} onChange={(e) => updateTransferRequest(idx, "namaProduk", e.target.value)} placeholder="Otomatis" /></td>
                       <td className="border px-1 py-1"><Input className="h-7 text-xs" value={req.estJumlahKL} onChange={(e) => updateTransferRequest(idx, "estJumlahKL", e.target.value)} placeholder="300" /></td>
-                      <td className="border px-1 py-1"><Input className="h-7 text-xs" value={req.estimasiJam} onChange={(e) => updateTransferRequest(idx, "estimasiJam", e.target.value)} placeholder="-" /></td>
+                      <td className="border px-1 py-1">
+                        <Input
+                          type="time"
+                          step="60"
+                          aria-label="Estimasi jam transfer"
+                          className="h-7 text-xs"
+                          value={req.estimasiJam}
+                          onChange={(e) => updateTransferRequest(idx, "estimasiJam", e.target.value)}
+                        />
+                      </td>
                       <td className="border px-1 py-1"><Input className="h-7 text-xs" value={req.keterangan} onChange={(e) => updateTransferRequest(idx, "keterangan", e.target.value)} placeholder="Roas KPI 0288" /></td>
                       <td className="border px-1 py-1 text-center">
                         <Button type="button" variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeTransferRequest(idx)}>
