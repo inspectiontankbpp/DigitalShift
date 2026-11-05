@@ -572,6 +572,8 @@ Migrasi berupa file SQL manual di `supabase/migrations/NN_*.sql`. Tidak ada Supa
 | `14` | Schema `reporting` + role read-only `powerbi_reader` untuk Power BI |
 | `15` | View dimensi star schema untuk Power BI |
 | `16` | Bucket Storage `powerbi` + policy unduhan supervisor |
+| `17` | View read-only `keep_alive_ping` |
+| `18` | Hardening privilege view keep-alive |
 
 ## 13. Batasan dan Catatan Implementasi
 
@@ -612,3 +614,15 @@ Power BI memakai jalur read-only terpisah dari aplikasi:
 - Panduan koneksi, measures DAX, dan batasan ada di `docs/integrasi-power-bi.md`.
 
 Jangan memberi `powerbi_reader` akses ke tabel `public`. Jika struktur `operational_data` berubah, update view lewat migration baru.
+
+## 16. Keep-Alive Supabase Free
+
+Supabase Free mem-pause project setelah 7 hari tanpa aktivitas database. Aplikasi memakai view read-only `public.keep_alive_ping` yang mengembalikan `now()`:
+
+- Uptime monitor eksternal memanggil `GET /rest/v1/keep_alive_ping?select=pinged_at` memakai anon key.
+- Setiap panggilan menjalankan `SELECT now()` sehingga tercatat sebagai aktivitas database.
+- View tidak menyimpan row, tidak membuka data aplikasi, dan hanya punya privilege `SELECT`.
+- Monitor memanggil Supabase langsung, bukan Vercel, sehingga tidak memakai kuota function Vercel.
+- Tidak ada cron atau daemon.
+
+Panduan setup dan troubleshooting ada di `docs/keep-alive-supabase.md`.
