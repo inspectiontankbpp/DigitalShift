@@ -237,7 +237,7 @@ Middleware mengizinkan operator membuka `/reports`.
 
 **Dampak**
 
-Operator dapat membaca dan mengekspor seluruh handover, termasuk data operasional, catatan, kendala, safety issue, dan riwayat shift. Ini bertentangan dengan klaim di `AGENTS.md` bahwa RLS membatasi operator ke handover miliknya.
+Operator dapat membaca dan mengekspor seluruh handover, termasuk data operasional, catatan, kendala, safety issue, dan riwayat shift. Ini bertentangan dengan klaim di dokumentasi proyek bahwa RLS membatasi operator ke handover miliknya.
 
 **Rekomendasi**
 
@@ -652,7 +652,7 @@ Catatan migrasi:
 2. Periksa error insert approval dan rollback status jika gagal.
 3. Kosongkan metadata approval lama saat reopen/edit.
 4. Cegah double submit pada tombol approve/reject.
-5. Perbarui `AGENTS.md` dan `docs/arsitektur-dan-alur-sistem.md` agar sesuai dengan RLS yang sebenarnya.
+5. Perbarui `README.md` dan `docs/arsitektur-dan-alur-sistem.md` agar sesuai dengan RLS yang sebenarnya.
 
 ### Fase 3 — Perbaikan sedang/rendah
 

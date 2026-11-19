@@ -19,7 +19,7 @@ Dokumen pendamping:
 
 - `docs/arsitektur-dan-alur-sistem.md` — arsitektur dan alur per halaman.
 - `docs/integrasi-power-bi.md` — setup reporting dan Power BI.
-- `AGENTS.md` — aturan kerja dan gotcha proyek.
+- `README.md` — gambaran sistem, fitur, dan cara menjalankan.
 
 ## 2. Prasyarat
 
@@ -304,7 +304,6 @@ Beberapa hal yang perlu diperhatikan sebelum production:
 ## 15. Referensi
 
 - `README.md`
-- `AGENTS.md`
 - `docs/arsitektur-dan-alur-sistem.md`
 - `docs/integrasi-power-bi.md`
 - `supabase/migrations/`
