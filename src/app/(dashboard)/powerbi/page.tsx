@@ -3,7 +3,6 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, BookOpen, Database, Download, FileSpreadsheet, LayoutDashboard, ShieldCheck } from "lucide-react"
 import { Card } from "@/components/ui/card"
-import { PowerBiCredentials } from "@/components/powerbi-credentials"
 
 const BUCKET = "powerbi"
 const FILE_NAME = "ShiftHandover.pbix"
@@ -74,14 +73,6 @@ export default async function PowerBiPage() {
         </div>
       </Card>
 
-      <PowerBiCredentials
-        host={process.env.POWERBI_DB_HOST ?? "aws-0-ap-northeast-1.pooler.supabase.com"}
-        port={process.env.POWERBI_DB_PORT ?? "5432"}
-        database={process.env.POWERBI_DB_NAME ?? "postgres"}
-        username={process.env.POWERBI_DB_USER ?? "powerbi_reader.getdgbyxhohfranaceqd"}
-        password={process.env.POWERBI_DB_PASSWORD ?? ""}
-      />
-
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="p-4">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
@@ -132,8 +123,8 @@ export default async function PowerBiPage() {
                 Klik <span className="font-medium text-foreground">Download .pbix</span>, lalu buka file tersebut.
               </li>
               <li>
-                Saat diminta kredensial, gunakan detail pada kartu{" "}
-                <span className="font-medium text-foreground">Kredensial koneksi Power BI</span> di atas.
+                Saat diminta kredensial, gunakan detail koneksi yang diberikan admin melalui password manager.
+                Kredensial tidak ditampilkan di aplikasi.
               </li>
               <li>
                 Klik <span className="font-medium text-foreground">Refresh</span> untuk mengambil data terbaru.

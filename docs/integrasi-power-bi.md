@@ -119,7 +119,7 @@ Catatan: `dim_date`, `dim_product`, dan `dim_tank` dibangun dari tabel `public` 
 alter role powerbi_reader with password '<password-kuat>';
 ```
 
-- Aplikasi membaca password dari environment `POWERBI_DB_PASSWORD` dan menampilkannya di halaman `/powerbi` (khusus supervisor) dengan tombol salin. Jangan hardcode password di source.
+- Aplikasi tidak membaca atau menampilkan password database. Simpan password `powerbi_reader` di password manager dan bagikan hanya kepada supervisor yang berwenang. Jangan hardcode password di source.
 - Simpan password di password manager. Rotasi setelah pergantian personel atau jika file kredensial bocor.
 - File `.pbix` biasanya menyimpan kredensial di Windows Credential Manager, bukan di file. Tetap perlakukan `.pbix` sebagai dokumen internal.
 - Jangan commit file kredensial ke Git.

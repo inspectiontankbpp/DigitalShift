@@ -35,7 +35,7 @@ Power BI Desktop memvalidasi sertifikat PostgreSQL. Supabase memakai CA self-sig
    - Port: `5432`
    - Database: `postgres`
    - User: `powerbi_reader.getdgbyxhohfranaceqd`
-   - Password: lihat kartu **Kredensial koneksi Power BI** di halaman `/powerbi` (supervisor) atau password manager.
+   - Password: minta admin atau lihat password manager. Jangan simpan di repo.
 5. Pastikan mode koneksi DirectQuery dan schema `reporting`.
 6. Refresh, cek visual, lalu simpan sebagai `.pbix` di OneDrive/SharePoint.
 

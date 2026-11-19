@@ -606,7 +606,7 @@ Power BI memakai jalur read-only terpisah dari aplikasi:
 - Role `powerbi_reader` hanya mendapat `CONNECT`, `USAGE` schema `reporting`, dan `SELECT` ke view.
 - Power BI Desktop memakai DirectQuery ke view tersebut; data tetap live tanpa Power BI Service.
 - Proyek PBIP/TMDL siap pakai ada di `powerbi/`: model 12 dimensi + 9 fact + 45 relasi + 41 measure, serta laporan 3 halaman dan 35 visual.
-- Menu `/powerbi` khusus supervisor menyediakan download `ShiftHandover.pbix` dari Supabase Storage private bucket `powerbi` lewat Route Handler `/api/powerbi/download`, serta kartu kredensial koneksi (dari `POWERBI_DB_PASSWORD`) dengan tombol salin.
+- Menu `/powerbi` khusus supervisor menyediakan download `ShiftHandover.pbix` dari Supabase Storage private bucket `powerbi` lewat Route Handler `/api/powerbi/download`. Kredensial database tidak ditampilkan di aplikasi; bagikan lewat password manager.
 - Panduan koneksi, measures DAX, dan batasan ada di `docs/integrasi-power-bi.md`.
 
 Jangan memberi `powerbi_reader` akses ke tabel `public`. Jika struktur `operational_data` berubah, update view lewat migration baru.
