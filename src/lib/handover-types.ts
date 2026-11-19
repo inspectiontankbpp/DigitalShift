@@ -81,18 +81,25 @@ export interface TransferRequest {
   keterangan: string
 }
 
+export interface ReceivingTank {
+  id?: string
+  noTangki: string
+  namaProduk: string
+  estJumlahKL: string
+  estimasiJam: string
+  keterangan: string
+}
+
 export interface HandoverTeams {
   yangMenyerahkan: {
     danru: string
     anggota1: string
     anggota2: string
-    anggota3: string
   }
   yangMenerima: {
     danru: string
     anggota1: string
     anggota2: string
-    anggota3: string
   }
   mengetahui: {
     spv: string
@@ -108,6 +115,7 @@ export interface OperationalData {
   criticalEquipment?: CriticalEquipment[]
   safetyTools?: SafetyTool[]
   transferRequests?: TransferRequest[]
+  receivingTanks?: ReceivingTank[]
   teams?: HandoverTeams
 }
 

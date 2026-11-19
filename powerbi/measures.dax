@@ -124,3 +124,14 @@ COUNTROWS(TransferRequestFact)
 
 Total Estimasi Transfer (KL) =
 SUM(TransferRequestFact[est_jumlah_kl])
+
+// ReceivingTankFact
+
+Total Tangki Penerimaan =
+COUNTROWS(ReceivingTankFact)
+
+Total Rencana Penerimaan (KL) =
+SUM(ReceivingTankFact[est_jumlah_kl])
+
+Handover dengan Penerimaan =
+CALCULATE([Total Handover], HandoverFact[receiving_tank_count] > 0)

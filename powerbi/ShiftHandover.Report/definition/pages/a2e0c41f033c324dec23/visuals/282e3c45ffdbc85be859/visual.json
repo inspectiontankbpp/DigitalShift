@@ -1,0 +1,110 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "282e3c45ffdbc85be859",
+  "position": {
+    "x": 24,
+    "y": 226,
+    "z": 300,
+    "height": 440,
+    "width": 620,
+    "tabOrder": 3
+  },
+  "visual": {
+    "visualType": "barChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReceivingTankFact"
+                    }
+                  },
+                  "Property": "nama_produk"
+                }
+              },
+              "queryRef": "ReceivingTankFact.nama_produk",
+              "nativeQueryRef": "nama_produk",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "HandoverFact"
+                    }
+                  },
+                  "Property": "Total Rencana Penerimaan (KL)"
+                }
+              },
+              "queryRef": "HandoverFact.Total Rencana Penerimaan (KL)",
+              "nativeQueryRef": "Total Rencana Penerimaan (KL)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "HandoverFact"
+                  }
+                },
+                "Property": "Total Rencana Penerimaan (KL)"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Rencana Penerimaan per Produk'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

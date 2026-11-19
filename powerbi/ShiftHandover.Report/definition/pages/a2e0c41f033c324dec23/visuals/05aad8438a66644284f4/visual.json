@@ -1,0 +1,158 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "05aad8438a66644284f4",
+  "position": {
+    "x": 660,
+    "y": 226,
+    "z": 300,
+    "height": 440,
+    "width": 596,
+    "tabOrder": 4
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReceivingTankFact"
+                    }
+                  },
+                  "Property": "form_number"
+                }
+              },
+              "queryRef": "ReceivingTankFact.form_number",
+              "nativeQueryRef": "No. Form"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimDate"
+                    }
+                  },
+                  "Property": "date"
+                }
+              },
+              "queryRef": "DimDate.date",
+              "nativeQueryRef": "Tanggal"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReceivingTankFact"
+                    }
+                  },
+                  "Property": "no_tangki"
+                }
+              },
+              "queryRef": "ReceivingTankFact.no_tangki",
+              "nativeQueryRef": "Tangki"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReceivingTankFact"
+                    }
+                  },
+                  "Property": "nama_produk"
+                }
+              },
+              "queryRef": "ReceivingTankFact.nama_produk",
+              "nativeQueryRef": "Produk"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReceivingTankFact"
+                    }
+                  },
+                  "Property": "est_jumlah_kl"
+                }
+              },
+              "queryRef": "ReceivingTankFact.est_jumlah_kl",
+              "nativeQueryRef": "Est. KL"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReceivingTankFact"
+                    }
+                  },
+                  "Property": "estimasi_jam"
+                }
+              },
+              "queryRef": "ReceivingTankFact.estimasi_jam",
+              "nativeQueryRef": "Jam"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReceivingTankFact"
+                    }
+                  },
+                  "Property": "keterangan"
+                }
+              },
+              "queryRef": "ReceivingTankFact.keterangan",
+              "nativeQueryRef": "Keterangan"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Detail Tangki Penerimaan'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

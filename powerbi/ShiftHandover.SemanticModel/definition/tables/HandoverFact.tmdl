@@ -207,6 +207,21 @@ table HandoverFact
 		formatString: #,##0.0
 		lineageTag: f96e128c-6982-4b8d-9829-8f396cd7542c
 
+	/// Jumlah baris tangki penerimaan.
+	measure 'Total Tangki Penerimaan' = COUNTROWS(ReceivingTankFact)
+		formatString: #,##0
+		lineageTag: f57466db-b259-478a-8959-23a77033a2da
+
+	/// Total estimasi volume tangki penerimaan dalam KL.
+	measure 'Total Rencana Penerimaan (KL)' = SUM(ReceivingTankFact[est_jumlah_kl])
+		formatString: #,##0.0
+		lineageTag: e35f56bf-709d-4762-aabc-11c641257bb9
+
+	/// Jumlah handover yang memiliki rencana penerimaan.
+	measure 'Handover dengan Penerimaan' = CALCULATE([Total Handover], HandoverFact[receiving_tank_count] > 0)
+		formatString: #,##0
+		lineageTag: 6581262e-3e52-41c0-852b-fdd890f98eb4
+
 	column handover_id
 		dataType: string
 		isHidden
@@ -481,11 +496,21 @@ table HandoverFact
 		lineageTag: 190d19da-ad14-4af9-80b3-74f7e3f7c2bb
 		sourceColumn: data_completeness_score
 
+	column receiving_tank_count
+		dataType: int64
+		lineageTag: 4841aea7-48ae-4980-8a41-de0fefe013a1
+		sourceColumn: receiving_tank_count
+
+	column estimated_receiving_kl
+		dataType: decimal
+		lineageTag: 1bd5912c-3fe5-4ab3-8983-0545d7f5d77b
+		sourceColumn: estimated_receiving_kl
+
 	partition HandoverFact = m
 		mode: directQuery
 		source =
 				let
-				    Source = PostgreSQL.Database("aws-0-ap-northeast-1.pooler.supabase.com:5432", "postgres"),
+				    Source = SupabasePostgres,
 				    Nav = Source{[Schema="reporting",Item="handover_fact"]}[Data]
 				in
 				    Nav

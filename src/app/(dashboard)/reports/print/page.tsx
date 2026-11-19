@@ -5,6 +5,15 @@ import { useSearchParams, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Printer, ArrowLeft, Loader2 } from "lucide-react"
+import { formatDateId, formatDateTimeId, formatLongDateId } from "@/lib/format"
+
+const STATUS_LABELS: Record<string, string> = {
+  draft: "Draft",
+  submitted: "Menunggu",
+  approved: "Disetujui",
+  rejected: "Ditolak",
+  reopened: "Dibuka Kembali",
+}
 
 interface Handover {
   id: string
@@ -49,37 +58,63 @@ export default function ReportsPrintPage() {
   }, [supabase, searchParams])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData()
   }, [fetchData])
 
-  useEffect(() => {
-    if (!loading && handovers.length > 0) {
-      const t = setTimeout(() => window.print(), 600)
-      return () => clearTimeout(t)
-    }
-  }, [loading, handovers])
-
-  const getStatusLabel = (status: string) => {
-    const v: Record<string, string> = {
-      draft: "Draft",
-      submitted: "Menunggu",
-      approved: "Disetujui",
-      rejected: "Ditolak",
-      reopened: "Dibuka Kembali",
-    }
-    return v[status] || status
-  }
+  const getStatusLabel = (status: string) => STATUS_LABELS[status] || status
 
   const today = new Date()
-  const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
-  const reportDate = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`
+  const reportDate = today.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
 
   const filterLabel = []
-  if (filterDate) {
-    const d = new Date(filterDate)
-    filterLabel.push(`${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`)
-  }
+  if (filterDate) filterLabel.push(formatLongDateId(filterDate))
   if (filterStatus && filterStatus !== "all") filterLabel.push(`Status: ${getStatusLabel(filterStatus)}`)
+
+  const statusCounts = handovers.reduce<Record<string, number>>((acc, h) => {
+    acc[h.status] = (acc[h.status] || 0) + 1
+    return acc
+  }, {})
+
+  useEffect(() => {
+    if (loading) return
+    const previous = document.title
+    const parts = ["Laporan Shift Handover"]
+    if (filterDate) parts.push(formatDateId(filterDate))
+    if (filterStatus && filterStatus !== "all") parts.push(STATUS_LABELS[filterStatus] || filterStatus)
+    document.title = parts.join(" - ")
+    return () => {
+      document.title = previous
+    }
+  }, [loading, filterDate, filterStatus])
+
+  useEffect(() => {
+    if (loading || handovers.length === 0) return
+    let cancelled = false
+    const waitForAssets = async () => {
+      try {
+        await document.fonts.ready
+      } catch {
+        // fonts API unavailable
+      }
+      const images = Array.from(document.images)
+      await Promise.all(
+        images.map((img) =>
+          img.complete
+            ? Promise.resolve()
+            : new Promise<void>((resolve) => {
+                img.onload = () => resolve()
+                img.onerror = () => resolve()
+              })
+        )
+      )
+      if (!cancelled) setTimeout(() => window.print(), 300)
+    }
+    waitForAssets()
+    return () => {
+      cancelled = true
+    }
+  }, [loading, handovers])
 
   if (loading) {
     return (
@@ -128,8 +163,13 @@ export default function ReportsPrintPage() {
         )}
 
         {/* Summary */}
-        <div className="mb-3 text-xs border border-black p-2">
-          <span className="font-bold">Total Records: </span>{handovers.length}
+        <div className="mb-3 text-xs border border-black p-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+          <span><span className="font-bold">Total Records: </span>{handovers.length}</span>
+          {Object.entries(statusCounts).map(([status, count]) => (
+            <span key={status}>
+              <span className="font-semibold">{getStatusLabel(status)}: </span>{count}
+            </span>
+          ))}
         </div>
 
         {/* Main Table */}
@@ -152,13 +192,13 @@ export default function ReportsPrintPage() {
                   <td className="border border-black p-1.5 text-center">{idx + 1}</td>
                   <td className="border border-black p-1.5 font-medium">{h.form_number}</td>
                   <td className="border border-black p-1.5 text-center">
-                    {new Date(h.tanggal).toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                    {formatDateId(h.tanggal)}
                   </td>
                   <td className="border border-black p-1.5 text-center">{h.shifts?.name || "-"}</td>
                   <td className="border border-black p-1.5">{h.profiles?.full_name || "-"}</td>
                   <td className="border border-black p-1.5 text-center font-semibold">{getStatusLabel(h.status)}</td>
                   <td className="border border-black p-1.5 text-center">
-                    {h.submitted_at ? new Date(h.submitted_at).toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "-"}
+                    {h.submitted_at ? formatDateTimeId(h.submitted_at) : "-"}
                   </td>
                 </tr>
               ))

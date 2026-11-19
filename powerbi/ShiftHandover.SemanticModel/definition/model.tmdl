@@ -11,6 +11,8 @@ model ShiftHandover
 
 annotation PBI_ProTooling = ["MCP-PBIModeling","DevMode"]
 
+expression SupabasePostgres = PostgreSQL.Database("aws-0-ap-northeast-1.pooler.supabase.com:5432", "postgres")
+
 ref table DimDate
 ref table DimOperator
 ref table DimSupervisor
@@ -32,4 +34,5 @@ ref table QCFact
 ref table CriticalEquipmentFact
 ref table SafetyToolFact
 ref table TransferRequestFact
+ref table ReceivingTankFact
 

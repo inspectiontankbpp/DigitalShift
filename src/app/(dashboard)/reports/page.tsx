@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -13,7 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { FileText, Download, Filter, Loader2, FileDown } from "lucide-react"
+import { FileText, Download, Filter, Loader2, FileDown, Files } from "lucide-react"
+import { formatDateId, formatDateTimeId, sanitizeFileName } from "@/lib/format"
 
 interface Handover {
   id: string
@@ -22,14 +24,20 @@ interface Handover {
   status: string
   kondisi_operasional: string
   submitted_at: string | null
+  approved_at: string | null
+  catatan: string | null
+  operational_data: { jamShift?: string } | null
   shifts: { name: string } | null
   profiles: { full_name: string } | null
 }
 
 import { useUser } from "@/contexts/user-context"
+import { useToast } from "@/contexts/toast-context"
 
 export default function ReportsPage() {
   const { loading: authLoading } = useUser()
+  const router = useRouter()
+  const toast = useToast()
   const supabase = createClient()
   const [handovers, setHandovers] = useState<Handover[]>([])
   const [loading, setLoading] = useState(true)
@@ -66,6 +74,18 @@ export default function ReportsPage() {
 
   const sanitize = (v: string) => v && /^[=+\-@]/.test(v) ? "\t" + v : v
 
+  const escapeCsv = (value: unknown) => {
+    const raw = sanitize(String(value ?? "")).replace(/\r?\n/g, " ")
+    return `"${raw.replace(/"/g, '""')}"`
+  }
+
+  const exportFileName = () => {
+    const parts = ["laporan-handover"]
+    parts.push(filterDate || "semua-tanggal")
+    parts.push(filterStatus && filterStatus !== "all" ? filterStatus : "semua-status")
+    return sanitizeFileName(`${parts.join("_")}.csv`)
+  }
+
   const handleExport = async () => {
     setExporting(true)
     try {
@@ -73,32 +93,62 @@ export default function ReportsPage() {
         .from("handovers")
         .select("*, shifts(name), profiles:operator_id(full_name)")
         .order("tanggal", { ascending: false })
+        .order("form_number", { ascending: true })
       if (filterDate) query = query.eq("tanggal", filterDate)
       if (filterStatus && filterStatus !== "all") query = query.eq("status", filterStatus)
-      const { data } = await query
-      if (!data?.length) { setExporting(false); return }
+      const { data, error } = await query
+      if (error) {
+        toast.error(error.message || "Gagal mengekspor CSV.")
+        return
+      }
+      if (!data?.length) {
+        toast.info("Tidak ada data untuk diekspor.")
+        return
+      }
 
-      const headers = ["Form Number", "Date", "Shift", "Operator", "Status", "Condition", "Submitted At"]
+      const headers = [
+        "Form Number",
+        "Tanggal",
+        "Shift",
+        "Jam Shift",
+        "Operator",
+        "Status",
+        "Kondisi Operasional",
+        "Submitted At",
+        "Approved At",
+        "Catatan",
+      ]
       const rows = data.map((h) => [
         h.form_number,
-        new Date(h.tanggal).toLocaleDateString(),
+        formatDateId(h.tanggal),
         h.shifts?.name || "",
+        h.operational_data?.jamShift || "",
         h.profiles?.full_name || "",
         h.status,
         h.kondisi_operasional,
-        h.submitted_at ? new Date(h.submitted_at).toLocaleString() : "",
-      ].map(sanitize))
+        formatDateTimeId(h.submitted_at),
+        formatDateTimeId(h.approved_at),
+        h.catatan || "",
+      ])
 
-      const csvContent = [headers.join(","), ...rows.map((r) => r.map((c) => `"${c}"`).join(","))].join("\n")
-      const blob = new Blob([csvContent], { type: "text/csv" })
+      const csvContent = "\uFEFF" + [
+        headers.map(escapeCsv).join(","),
+        ...rows.map((r) => r.map(escapeCsv).join(",")),
+      ].join("\r\n")
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `shift-report-${new Date().toISOString().split("T")[0]}.csv`
+      a.download = exportFileName()
+      document.body.appendChild(a)
       a.click()
-      URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+      toast.success(`${data.length} data berhasil diekspor ke CSV.`)
     } catch (error) {
       console.error("Export error:", error)
+      toast.error("Gagal mengekspor CSV.")
     } finally {
       setExporting(false)
     }
@@ -109,7 +159,18 @@ export default function ReportsPage() {
     if (filterDate) params.set("date", filterDate)
     if (filterStatus) params.set("status", filterStatus)
     const url = `/reports/print${params.toString() ? "?" + params.toString() : ""}`
-    window.open(url, "_blank")
+    const win = window.open(url, "_blank")
+    if (!win) {
+      toast.error("Popup diblokir. Izinkan popup untuk membuka laporan PDF.")
+    }
+  }
+
+  const handleDownloadAll = () => {
+    const params = new URLSearchParams()
+    if (filterDate) params.set("date", filterDate)
+    if (filterStatus) params.set("status", filterStatus)
+    const url = `/reports/download${params.toString() ? "?" + params.toString() : ""}`
+    router.push(url)
   }
 
   const getStatusBadge = (status: string) => {
@@ -134,6 +195,10 @@ export default function ReportsPage() {
           <p className="text-muted-foreground mt-1">Export and view shift reports</p>
         </div>
         <div className="flex items-center gap-2">
+          <Button onClick={handleDownloadAll} disabled={handovers.length === 0} variant="outline" size="sm">
+            <Files className="h-4 w-4 mr-2" />
+            Berkas
+          </Button>
           <Button onClick={handleExportPDF} disabled={handovers.length === 0} variant="outline" size="sm">
             <FileDown className="h-4 w-4 mr-2" />
             PDF
@@ -224,7 +289,7 @@ export default function ReportsPage() {
                           {h.form_number}
                         </a>
                       </td>
-                      <td className="px-4 py-3">{new Date(h.tanggal).toLocaleDateString()}</td>
+                      <td className="px-4 py-3">{formatDateId(h.tanggal)}</td>
                       <td className="px-4 py-3">{h.shifts?.name}</td>
                       <td className="px-4 py-3">{h.profiles?.full_name}</td>
                       <td className="px-4 py-3">
@@ -233,7 +298,7 @@ export default function ReportsPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
-                        {h.submitted_at ? new Date(h.submitted_at).toLocaleString() : "-"}
+                        {h.submitted_at ? formatDateTimeId(h.submitted_at) : "-"}
                       </td>
                     </tr>
                   ))}
@@ -253,8 +318,8 @@ export default function ReportsPage() {
                   </div>
                   <p className="text-xs text-muted-foreground">{h.shifts?.name} &middot; {h.profiles?.full_name}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {new Date(h.tanggal).toLocaleDateString()}
-                    {h.submitted_at ? ` &middot; ${new Date(h.submitted_at).toLocaleString()}` : ""}
+                    {formatDateId(h.tanggal)}
+                    {h.submitted_at ? ` · ${formatDateTimeId(h.submitted_at)}` : ""}
                   </p>
                 </a>
               ))}

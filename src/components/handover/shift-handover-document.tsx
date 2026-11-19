@@ -16,7 +16,7 @@ interface ShiftHandoverDocumentProps {
     form_number?: string
     tanggal?: string
     status?: string
-    shifts?: { name?: string; start_time?: string; end_time?: string }
+    shifts?: { name?: string }
     profiles?: { full_name?: string }
     catatan?: string
     kondisi_operasional?: string
@@ -49,16 +49,17 @@ export function ShiftHandoverDocument({ handover, activities = [] }: ShiftHandov
       : /sore|siang|regu\s*2|regu2/i.test(rawShiftName)
         ? "Sore"
         : rawShiftName
-  const jamShift = opData.jamShift || (handover.shifts ? `${handover.shifts.start_time || ''} s/d ${handover.shifts.end_time || ''}` : "16:00 s/d 00:00")
+  const jamShift = opData.jamShift?.trim() || "-"
 
   const tankLevels = opData.tankLevels || []
   const qcChecks = opData.qcChecks || []
   const criticalEq = opData.criticalEquipment || []
   const safetyTools = opData.safetyTools || []
   const transferRequests = opData.transferRequests || []
+  const receivingTanks = opData.receivingTanks || []
   const teams = opData.teams || {
-    yangMenyerahkan: { danru: handover.profiles?.full_name || "", anggota1: "", anggota2: "", anggota3: "" },
-    yangMenerima: { danru: "", anggota1: "", anggota2: "", anggota3: "" },
+    yangMenyerahkan: { danru: handover.profiles?.full_name || "", anggota1: "", anggota2: "" },
+    yangMenerima: { danru: "", anggota1: "", anggota2: "" },
     mengetahui: { spv: "" }
   }
 
@@ -351,6 +352,41 @@ export function ShiftHandoverDocument({ handover, activities = [] }: ShiftHandov
         </div>
       </div>
 
+      {/* Tangki Penerimaan */}
+      <div className="mb-4 page-break-inside-avoid">
+        <div className="font-bold text-xs bg-gray-200 border border-black p-1.5 border-b-0">
+          Tangki Penerimaan
+        </div>
+        <table className="w-full border-collapse border border-black text-xs">
+          <thead>
+            <tr className="bg-gray-100 font-bold text-center">
+              <th className="border border-black p-1.5 w-12">No</th>
+              <th className="border border-black p-1.5 text-left">Produk</th>
+              <th className="border border-black p-1.5 w-16">Jumlah</th>
+              <th className="border border-black p-1.5 text-left">Keterangan</th>
+            </tr>
+          </thead>
+          <tbody>
+            {receivingTanks.length > 0 ? (
+              receivingTanks.map((tank, idx) => (
+                <tr key={idx}>
+                  <td className="border border-black p-1.5 text-center">{tank.noTangki}</td>
+                  <td className="border border-black p-1.5 font-medium">{tank.namaProduk}</td>
+                  <td className="border border-black p-1.5 text-center">{tank.estJumlahKL} KL</td>
+                  <td className="border border-black p-1.5">{tank.keterangan}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="border border-black p-4 text-center text-gray-400 italic">
+                  Tidak ada data tangki penerimaan
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
       {/* Signatures & Handover Acknowledgement Section */}
       <div className="border border-black p-3 mt-4 page-break-inside-avoid">
         <div className="grid grid-cols-2 gap-4 border-b border-black pb-4 text-xs">
@@ -372,10 +408,6 @@ export function ShiftHandoverDocument({ handover, activities = [] }: ShiftHandov
                 <span>Anggota 2:</span>
                 <span>{teams.yangMenyerahkan?.anggota2 || "-"}</span>
               </div>
-              <div className="flex justify-between">
-                <span>Anggota 3:</span>
-                <span>{teams.yangMenyerahkan?.anggota3 || "-"}</span>
-              </div>
             </div>
           </div>
 
@@ -396,10 +428,6 @@ export function ShiftHandoverDocument({ handover, activities = [] }: ShiftHandov
               <div className="flex justify-between">
                 <span>Anggota 2:</span>
                 <span>{teams.yangMenerima?.anggota2 || "-"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Anggota 3:</span>
-                <span>{teams.yangMenerima?.anggota3 || "-"}</span>
               </div>
             </div>
           </div>
@@ -425,6 +453,10 @@ export function ShiftHandoverDocument({ handover, activities = [] }: ShiftHandov
 
       <div className="mt-2 text-[10px] text-gray-500 italic text-center print:block">
         * Catatan: dapat disertakan lampiran formulir-formulir atau dokumen catatan lain yang terkait.
+      </div>
+
+      <div className="mt-1 text-[10px] text-gray-500 italic text-center print:block">
+        * Dokumen ini dinyatakan sah walaupun tanpa tanda tangan pejabat ybs, karena dicetak dari sistem Shift Handover Online.
       </div>
     </div>
   )

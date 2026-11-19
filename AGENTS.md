@@ -2,6 +2,8 @@
 
 PWA for shift handovers with an Indonesian UI. Operators submit handovers; supervisors approve, reject, or reopen them. The acknowledgement step and photo uploads were removed.
 
+`AGENTS.md` is the canonical instruction file; `CLAUDE.md` only contains `@AGENTS.md`.
+
 ## Commands
 
 - `npm run dev` — dev server at localhost:3000
@@ -17,13 +19,14 @@ No tests, CI, or pre-commit hooks. `npm run lint` currently fails on a pre-exist
 - Next.js 16 App Router + React 19, TypeScript strict, alias `@/*` → `src/*`.
 - `src/app/(dashboard)/` route group adds the shared `Header` and realtime toasts; auth pages sit outside it.
 - `src/middleware.ts` enforces auth and role access: operators are redirected away from `/dashboard`, `/powerbi`, and `/settings`, but may open `/reports` (RLS limits them to their own handovers). Authenticated visits to `/login` go to `/dashboard` (supervisor) or `/handover` (operator); the login form itself pushes `/dashboard`, where the server page redirects operators.
-- Almost every page is a client component querying Supabase directly via `@/lib/supabase/client`. Only `dashboard/page.tsx` is a server component (`@/lib/supabase/server`). The only Route Handler is `/api/powerbi/download` for the supervisor-only `.pbix` download; do not introduce an API layer for existing flows.
+- Almost every page is a client component querying Supabase directly via `@/lib/supabase/client`. `dashboard/page.tsx`, `powerbi/page.tsx`, and root `page.tsx` are server components (`@/lib/supabase/server`). The only Route Handler is `/api/powerbi/download` for the supervisor-only `.pbix` download; do not introduce an API layer for existing flows.
 - Auth uses `@supabase/ssr`; middleware refreshes cookies. `.env.local` needs `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (gitignored).
 - Roles live in `profiles.role` (`operator` | `supervisor`); there is no `users` table in app code.
 - UI primitives are hand-written shadcn-style components in `src/components/ui` (no `components.json` or Radix). Tailwind v4 uses CSS variables in `globals.css`; there is no `tailwind.config.*`. Use `cn` from `@/lib/utils`.
 - `ResponsiveScale` + print CSS keep fixed-width forms readable on mobile and printable. The reports print page auto-triggers `window.print()`; the handover print page only does so with `?auto=true`.
 - PWA uses `public/manifest.json`, `public/sw.js`, and `public/offline.html`. The service worker is registered in production only, caches static assets, and serves an offline fallback for navigation; API/auth/Supabase requests are never cached.
-- Power BI reporting layer: schema `reporting` (9 fact + 12 dimension views) + read-only role `powerbi_reader`; see `docs/integrasi-power-bi.md`. Ready-to-open PBIP/TMDL project is in `powerbi/` (3 pages, 35 visuals, 41 measures). Supervisors download `ShiftHandover.pbix` from Supabase Storage private bucket `powerbi` via `/powerbi`; no binary is committed. Never grant `powerbi_reader` access to `public` tables.
+- Power BI reporting layer: schema `reporting` (9 fact + 12 dimension views) + read-only role `powerbi_reader`; see `docs/integrasi-power-bi.md`. Ready-to-open PBIP/TMDL project is in `powerbi/` (3 pages, 35 visuals, 41 measures). Supervisors download `ShiftHandover.pbix` from Supabase Storage private bucket `powerbi` via `/powerbi`; no binary is committed. Never grant `powerbi_reader` access to `public` tables. The `/powerbi` page shows connection credentials from `POWERBI_DB_PASSWORD` (supervisor-only, with copy buttons); never hardcode the password in source.
+- **Keep-alive**: migrations `17`/`18` add read-only view `public.keep_alive_ping` returning `now()`. An external uptime monitor calls `GET /rest/v1/keep_alive_ping?select=pinged_at` with the anon key; this is the only pause-prevention mechanism. No cron, daemon, or Vercel Function. UptimeRobot Free cannot send custom headers, so it uses the `&apikey=<anon-key>` query param. Never use `service_role` for this. See `docs/keep-alive-supabase.md`.
 
 ## Data model
 
@@ -41,6 +44,7 @@ No tests, CI, or pre-commit hooks. `npm run lint` currently fails on a pre-exist
 - Approved handovers cannot be deleted. Operators may delete their own drafts; supervisors may delete any non-approved handover.
 - Migrations are manual SQL files in `supabase/migrations/NN_*.sql` (no CLI config, no codegen). Apply in numeric order. Do not re-run `01`–`09` after `10`: early migrations create permissive RLS (`USING (true)`) and `10_security_rls_audit_indexes.sql` is the security fix.
 - Migration 10 revokes anon SELECT on `handover_sync` and sets `security_invoker = true`, so the Google Sheets sync in `scripts/sheets-sync/` no longer works as documented. Treat that script as stale; current architecture is documented in `docs/arsitektur-dan-alur-sistem.md`.
+- Supabase default privileges grant ALL on new `public` views to `anon`, `authenticated`, and `service_role`. After creating any view, explicitly `REVOKE ALL` and grant only the needed privilege (see migration `18`).
 - Form numbers can collide despite the unique index; duplicates surface as Supabase insert errors.
 - User-facing copy is Indonesian; keep new labels and messages consistent with that.
 

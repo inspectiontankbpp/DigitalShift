@@ -1,0 +1,94 @@
+/// Fakta rencana penerimaan produk per tangki.
+table ReceivingTankFact
+	lineageTag: 3f6323d4-8fdd-40b5-8b19-fa11da30a412
+
+	column handover_id
+		dataType: string
+		isHidden
+		lineageTag: e5fd818b-9a58-4131-98ea-fd482eee1e6a
+		sourceColumn: handover_id
+
+	column form_number
+		dataType: string
+		lineageTag: 668b0e54-693f-4b58-bf7b-2e9f3ad621dd
+		sourceColumn: form_number
+
+	column tanggal_operasional
+		dataType: dateTime
+		lineageTag: e5627916-86b5-4c65-88a4-b97e7bd7946c
+		sourceColumn: tanggal_operasional
+
+	column shift_id
+		dataType: string
+		isHidden
+		lineageTag: b61cbb91-9949-494c-af84-997df9c1a1ff
+		sourceColumn: shift_id
+
+	column shift_name
+		dataType: string
+		isHidden
+		lineageTag: 63041065-0a14-4730-9cbc-c0c0812ff8c2
+		sourceColumn: shift_name
+
+	column regu_shift
+		dataType: string
+		isHidden
+		lineageTag: c17a84c5-1cdc-4655-b840-6faa17743a88
+		sourceColumn: regu_shift
+
+	column operator_id
+		dataType: string
+		isHidden
+		lineageTag: 52572468-f170-4ddc-a968-9f96f99a8322
+		sourceColumn: operator_id
+
+	column operator_name
+		dataType: string
+		isHidden
+		lineageTag: 98e665ae-91bd-455c-beb7-27628e9bcc82
+		sourceColumn: operator_name
+
+	column no_tanki_normalized
+		dataType: string
+		isHidden
+		lineageTag: 46d90ce1-c4a4-43e4-8ca2-147fe31cda16
+		sourceColumn: no_tanki_normalized
+
+	column no_tangki
+		dataType: string
+		lineageTag: d9609ab7-f661-4d22-aaab-ab4522700bcf
+		sourceColumn: no_tangki
+
+	column nama_produk
+		dataType: string
+		lineageTag: 0d43a4b8-9abb-46fb-a59e-e9d03de5fc57
+		sourceColumn: nama_produk
+
+	column est_jumlah_kl_text
+		dataType: string
+		lineageTag: 3cb502ea-c338-4a4d-9e45-de98e9cfbdfd
+		sourceColumn: est_jumlah_kl_text
+
+	column est_jumlah_kl
+		dataType: decimal
+		lineageTag: 471d2152-61bf-4aa1-9389-63ce7d7027fb
+		sourceColumn: est_jumlah_kl
+
+	column estimasi_jam
+		dataType: string
+		lineageTag: fee89bb5-682c-427a-9632-aa4768158bb3
+		sourceColumn: estimasi_jam
+
+	column keterangan
+		dataType: string
+		lineageTag: 5fbc2000-eadf-4f7c-bad7-b8abcb3750e2
+		sourceColumn: keterangan
+
+	partition ReceivingTankFact = m
+		mode: directQuery
+		source =
+				let
+				    Source = SupabasePostgres,
+				    Nav = Source{[Schema="reporting",Item="receiving_tank_fact"]}[Data]
+				in
+				    Nav

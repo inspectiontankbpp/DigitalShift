@@ -72,7 +72,7 @@ src/
       approvals/            Review & riwayat approval
       reports/              Daftar laporan, filter, export CSV/PDF
       reports/print/        Halaman cetak laporan
-      settings/             Admin users & shifts (supervisor)
+      settings/             Admin users, shifts & tanks (supervisor)
   components/
     header.tsx              Navigasi berdasarkan role
     realtime-subscriber.tsx Toast realtime untuk handover
@@ -130,7 +130,7 @@ Form client-side untuk membuat handover baru:
 
 - Tanggal otomatis hari ini.
 - Shift/regu diambil dari tabel `shifts` yang aktif.
-- Jam shift otomatis mengikuti `start_time`–`end_time` shift.
+- Jam shift diisi manual pada formulir handover.
 - Form number dibuat otomatis: `SH-YYYYMMDD-NNN` dengan 3 digit acak.
 - Data yang diisi:
   - Level dan water tangki
@@ -249,9 +249,10 @@ Operator tidak dapat membuka halaman ini.
 Hanya supervisor. Berisi tab:
 
 - **Users**: CRUD data `profiles`.
-- **Shifts**: CRUD `shifts` (nama, jam mulai, jam selesai).
+- **Shifts**: CRUD `shifts` (nama; jam shift diisi manual di form handover).
+- **Tanks**: CRUD `tank_products` (no. tangki, produk, urutan, status aktif).
 
-Tab Users mengelola baris `profiles`, bukan membuat akun Supabase Auth. Pembuatan akun Auth tetap dilakukan di Supabase. Master `tank_products` belum memiliki UI pengelolaan; data diisi lewat migrasi/seed.
+Tab Users mengelola baris `profiles`, bukan membuat akun Supabase Auth. Pembuatan akun Auth tetap dilakukan di Supabase. Tab Tanks mengelola master `tank_products`; hanya tangki aktif yang muncul di form handover.
 
 ## 7. Siklus Status Handover
 
@@ -303,7 +304,7 @@ Catatan:
 |---|---|
 | `id` | UUID |
 | `name` | Nama shift/regu |
-| `start_time`, `end_time` | Jam shift (`time`) |
+| `start_time`, `end_time` | Legacy; tidak dipakai form dan boleh kosong (`time`) |
 | `is_active` | Hanya shift aktif yang dipakai form |
 | `slots` | JSONB; ada di DB, belum dipakai form saat ini |
 | `created_at`, `updated_at` | Timestamp |
@@ -580,7 +581,6 @@ Migrasi berupa file SQL manual di `supabase/migrations/NN_*.sql`. Tidak ada Supa
 - `handover_activities.waktu` bertipe `time`, sehingga Supabase dapat mengembalikan `HH:MM:SS`; tampilan dokumen memotong detik menjadi `HH:MM`.
 - `handover_activities` menyimpan sub-kegiatan dengan cara digabung ke `deskripsi`; saat edit/print, string dipecah kembali dengan `". "`.
 - `outstanding_jobs` hanya dibaca dashboard; belum ada UI input.
-- `tank_products` belum punya UI admin; perubahan data dilakukan lewat SQL/migrasi.
 - `handover_sync` masih ada di database, tetapi bukan bagian dari alur aktif.
 - Aplikasi belum memiliki mode offline.
 
@@ -606,7 +606,7 @@ Power BI memakai jalur read-only terpisah dari aplikasi:
 - Role `powerbi_reader` hanya mendapat `CONNECT`, `USAGE` schema `reporting`, dan `SELECT` ke view.
 - Power BI Desktop memakai DirectQuery ke view tersebut; data tetap live tanpa Power BI Service.
 - Proyek PBIP/TMDL siap pakai ada di `powerbi/`: model 12 dimensi + 9 fact + 45 relasi + 41 measure, serta laporan 3 halaman dan 35 visual.
-- Menu `/powerbi` khusus supervisor menyediakan download `ShiftHandover.pbix` dari Supabase Storage private bucket `powerbi` lewat Route Handler `/api/powerbi/download`.
+- Menu `/powerbi` khusus supervisor menyediakan download `ShiftHandover.pbix` dari Supabase Storage private bucket `powerbi` lewat Route Handler `/api/powerbi/download`, serta kartu kredensial koneksi (dari `POWERBI_DB_PASSWORD`) dengan tombol salin.
 - Panduan koneksi, measures DAX, dan batasan ada di `docs/integrasi-power-bi.md`.
 
 Jangan memberi `powerbi_reader` akses ke tabel `public`. Jika struktur `operational_data` berubah, update view lewat migration baru.

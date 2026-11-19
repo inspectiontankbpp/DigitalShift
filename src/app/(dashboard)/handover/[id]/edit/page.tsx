@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, type KeyboardEvent } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Card } from "@/components/ui/card"
@@ -14,8 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Plus, Trash2, Save, Send, Loader2, ArrowLeft, CheckSquare, Layers, AlertCircle } from "lucide-react"
+import { Plus, Trash2, Save, Send, Loader2, ArrowLeft, CheckSquare, Layers, AlertCircle, Eye } from "lucide-react"
 import { ResponsiveScale } from "@/components/responsive-scale"
+import { ShiftHandoverDocument } from "@/components/handover/shift-handover-document"
 import { useToast } from "@/contexts/toast-context"
 import { useUser } from "@/contexts/user-context"
 import {
@@ -30,6 +31,7 @@ import {
   CriticalEquipment,
   SafetyTool,
   TransferRequest,
+  ReceivingTank,
   HandoverTeams,
   OperationalData
 } from "@/lib/handover-types"
@@ -47,23 +49,9 @@ const REGU_OPTIONS_FALLBACK = [
   { id: "regu3", name: "Malam" },
 ]
 
-const SHIFT_TIMES_FALLBACK: Record<string, { label: string }> = {
-  regu1: { label: "06:00 s/d 14:00" },
-  regu2: { label: "16:00 s/d 00:00" },
-  regu3: { label: "22:00 s/d 06:00" },
-}
-
 interface ShiftOption {
   id: string
   name: string
-  start_time: string
-  end_time: string
-}
-
-function formatShiftTime(start: string, end: string) {
-  const s = (start || "").slice(0, 5)
-  const e = (end || "").slice(0, 5)
-  return `${s} s/d ${e}`
 }
 
 export default function EditHandoverPage() {
@@ -79,7 +67,7 @@ export default function EditHandoverPage() {
 
   const [tanggal, setTanggal] = useState(new Date().toISOString().split("T")[0])
   const [reguShift, setReguShift] = useState("Sore")
-  const [jamShift, setJamShift] = useState("16:00 s/d 00:00")
+  const [jamShift, setJamShift] = useState("")
   const [selectedShift, setSelectedShift] = useState("")
   const [shiftOptions, setShiftOptions] = useState<ShiftOption[]>([])
 
@@ -89,14 +77,16 @@ export default function EditHandoverPage() {
   const [criticalEquipment, setCriticalEquipment] = useState<CriticalEquipment[]>(DEFAULT_CRITICAL_EQUIPMENT)
   const [safetyTools, setSafetyTools] = useState<SafetyTool[]>(DEFAULT_SAFETY_TOOLS)
   const [transferRequests, setTransferRequests] = useState<TransferRequest[]>([])
+  const [receivingTanks, setReceivingTanks] = useState<ReceivingTank[]>([])
   const [teams, setTeams] = useState<HandoverTeams>({
-    yangMenyerahkan: { danru: "", anggota1: "", anggota2: "", anggota3: "" },
-    yangMenerima: { danru: "", anggota1: "", anggota2: "", anggota3: "" },
+    yangMenyerahkan: { danru: "", anggota1: "", anggota2: "" },
+    yangMenerima: { danru: "", anggota1: "", anggota2: "" },
     mengetahui: { spv: "" }
   })
   const [activities, setActivities] = useState<Activity[]>([])
   const [pendingHandover, setPendingHandover] = useState<{ id: string; form_number: string; status: string } | null>(null)
   const [handoverStatus, setHandoverStatus] = useState("")
+  const [previewMode, setPreviewMode] = useState(false)
   const savingRef = useRef(false)
 
   useEffect(() => {
@@ -108,7 +98,7 @@ export default function EditHandoverPage() {
         .from("shifts")
         .select("*")
         .eq("is_active", true)
-        .order("start_time")
+        .order("name")
       if (shiftsData?.length) setShiftOptions(shiftsData as ShiftOption[])
 
       const { data: tankProductsData } = await supabase
@@ -165,6 +155,16 @@ export default function EditHandoverPage() {
           }))
         )
       }
+      if (op.receivingTanks?.length) {
+        const products = (tankProductsData as TankProduct[] | null) ?? []
+        setReceivingTanks(
+          op.receivingTanks.map((tank) => ({
+            ...tank,
+            namaProduk: tank.namaProduk || getTankProduct(products, tank.noTangki),
+            estimasiJam: normalizeActivityTime(tank.estimasiJam || "")?.slice(0, 5) ?? "",
+          }))
+        )
+      }
       if (op.teams) setTeams(op.teams)
 
       // Fallback: if no shift_id stored, match by shift name
@@ -173,7 +173,6 @@ export default function EditHandoverPage() {
         if (match) {
           setSelectedShift(match.id)
           setReguShift(match.name)
-          setJamShift(formatShiftTime(match.start_time, match.end_time))
         }
       }
 
@@ -214,13 +213,10 @@ export default function EditHandoverPage() {
     if (shift) {
       setSelectedShift(shift.id)
       setReguShift(shift.name)
-      setJamShift(formatShiftTime(shift.start_time, shift.end_time))
       return
     }
     const fallback = REGU_OPTIONS_FALLBACK.find((r) => r.id === value)
-    const timeInfo = SHIFT_TIMES_FALLBACK[value]
     if (fallback) setReguShift(fallback.name)
-    if (timeInfo) setJamShift(timeInfo.label)
   }
 
   const handleSave = async (status: string) => {
@@ -264,6 +260,7 @@ export default function EditHandoverPage() {
         criticalEquipment,
         safetyTools,
         transferRequests,
+        receivingTanks,
         teams,
       }
 
@@ -387,6 +384,23 @@ export default function EditHandoverPage() {
   }
   const removeTransferRequest = (idx: number) => setTransferRequests(transferRequests.filter((_, i) => i !== idx))
 
+  const addReceivingTank = () => setReceivingTanks([...receivingTanks, { noTangki: "", namaProduk: "", estJumlahKL: "", estimasiJam: "", keterangan: "" }])
+  const updateReceivingTank = (idx: number, field: keyof ReceivingTank, value: string) => {
+    const updated = [...receivingTanks]
+    updated[idx] = { ...updated[idx], [field]: value }
+    setReceivingTanks(updated)
+  }
+  const updateReceivingTankNumber = (idx: number, value: string) => {
+    const updated = [...receivingTanks]
+    updated[idx] = {
+      ...updated[idx],
+      noTangki: value,
+      namaProduk: value ? getTankProduct(tankProducts, value) || updated[idx].namaProduk : "",
+    }
+    setReceivingTanks(updated)
+  }
+  const removeReceivingTank = (idx: number) => setReceivingTanks(receivingTanks.filter((_, i) => i !== idx))
+
   const addActivity = () => setActivities([...activities, { waktu: getCurrentTimeValue(), aktivitas: "", subs: [""] }])
   const removeActivity = (idx: number) => setActivities(activities.filter((_, i) => i !== idx))
   const updateActivity = (idx: number, field: keyof Activity, value: string) => {
@@ -418,6 +432,40 @@ export default function EditHandoverPage() {
     return days[d.getDay()]
   }
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" })
+
+  const handleFormKeyDown = (e: KeyboardEvent<HTMLFormElement>) => {
+    if (e.key !== "Enter") return
+    const target = e.target as HTMLElement
+    if (target.tagName === "TEXTAREA" || target.tagName === "BUTTON" || target.isContentEditable) return
+    if (target.tagName === "INPUT") e.preventDefault()
+  }
+
+  const previewHandover = {
+    form_number: "PRATINJAU",
+    tanggal,
+    status: handoverStatus || "draft",
+    shifts: shiftOptions.find((s) => s.id === selectedShift),
+    profiles: { full_name: profile?.full_name || "" },
+    kondisi_operasional: "normal",
+    operational_data: {
+      reguShift,
+      shiftName: reguShift,
+      jamShift,
+      tankLevels,
+      qcChecks,
+      criticalEquipment,
+      safetyTools,
+      transferRequests,
+      receivingTanks,
+      teams,
+    },
+  }
+
+  const previewActivities = activities.map((a) => ({
+    waktu: a.waktu,
+    aktivitas: a.aktivitas,
+    deskripsi: [a.aktivitas, ...a.subs].map((i) => i.trim()).filter(Boolean).join(". "),
+  }))
 
   if (loading) {
     return (
@@ -451,7 +499,27 @@ export default function EditHandoverPage() {
       )}
 
       <ResponsiveScale baseWidth={800}>
-      <form onSubmit={(e) => { e.preventDefault(); handleSave("submitted") }} className="space-y-6">
+      {previewMode ? (
+        <div className="space-y-6">
+          <div className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-blue-900">
+            <Eye className="h-4 w-4" />
+            Periksa kembali data di bawah. Klik Edit jika ada yang salah, atau Submit untuk menyimpan. Perubahan belum tersimpan.
+          </div>
+          <div className="bg-white p-2 sm:p-4 rounded-xl border">
+            <ShiftHandoverDocument handover={previewHandover} activities={previewActivities} />
+          </div>
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4">
+            <Button type="button" variant="outline" onClick={() => setPreviewMode(false)} className="w-full sm:w-auto">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
+            <Button type="button" onClick={() => handleSave("submitted")} disabled={saving || !!pendingHandover} className="w-full sm:w-auto">
+              {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Menyimpan...</> : <><Send className="h-4 w-4 mr-2" />Simpan & Submit</>}
+            </Button>
+          </div>
+        </div>
+      ) : (
+      <form onSubmit={(e) => { e.preventDefault(); handleSave("submitted") }} onKeyDown={handleFormKeyDown} className="space-y-6">
         <Card className="p-0 overflow-hidden">
           <div className="bg-primary/5 p-4 border-b">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -480,7 +548,11 @@ export default function EditHandoverPage() {
               </div>
               <div className="space-y-1">
                 <Label>Jam Shift</Label>
-                <Input value={jamShift} onChange={(e) => setJamShift(e.target.value)} readOnly />
+                <Input
+                  value={jamShift}
+                  onChange={(e) => setJamShift(e.target.value)}
+                  placeholder="06:00 s/d 14:00"
+                />
               </div>
             </div>
           </div>
@@ -789,6 +861,63 @@ export default function EditHandoverPage() {
         </Card>
 
         <Card className="p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold flex items-center gap-2"><Layers className="h-5 w-5 text-primary" />Tangki Penerimaan</h2>
+            <Button type="button" variant="outline" size="sm" onClick={addReceivingTank}><Plus className="h-3.5 w-3.5 mr-1" /> Tangki</Button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs border-collapse">
+              <thead><tr className="bg-muted/50">
+                <th className="border px-2 py-1.5 text-left font-medium">No. Tangki</th>
+                <th className="border px-2 py-1.5 text-left font-medium">Nama Produk</th>
+                <th className="border px-2 py-1.5 text-left font-medium">Est.Jumlah (KL)</th>
+                <th className="border px-2 py-1.5 text-left font-medium">Estimasi (Jam)</th>
+                <th className="border px-2 py-1.5 text-left font-medium">Keterangan</th>
+                <th className="border px-1 py-1.5 w-8"></th>
+              </tr></thead>
+              <tbody>
+                {receivingTanks.map((tank, idx) => (
+                  <tr key={idx}>
+                    <td className="border px-1 py-1">
+                      <select
+                        aria-label="No. Tangki"
+                        className="h-7 w-full rounded-md border border-input bg-background px-1 text-xs"
+                        value={tank.noTangki}
+                        onChange={(e) => updateReceivingTankNumber(idx, e.target.value)}
+                      >
+                        <option value="">Pilih</option>
+                        {tankProducts.map((product) => (
+                          <option key={product.no_tanki} value={product.no_tanki}>
+                            {product.no_tanki}
+                          </option>
+                        ))}
+                        {tank.noTangki && !tankProducts.some((product) => product.no_tanki === tank.noTangki) && (
+                          <option value={tank.noTangki}>{tank.noTangki}</option>
+                        )}
+                      </select>
+                    </td>
+                    <td className="border px-1 py-1"><Input className="h-7 text-xs" value={tank.namaProduk} onChange={(e) => updateReceivingTank(idx, "namaProduk", e.target.value)} placeholder="Otomatis" /></td>
+                    <td className="border px-1 py-1"><Input className="h-7 text-xs" value={tank.estJumlahKL} onChange={(e) => updateReceivingTank(idx, "estJumlahKL", e.target.value)} placeholder="300" /></td>
+                    <td className="border px-1 py-1">
+                      <Input
+                        type="time"
+                        step="60"
+                        aria-label="Estimasi jam tangki penerimaan"
+                        className="h-7 text-xs"
+                        value={tank.estimasiJam}
+                        onChange={(e) => updateReceivingTank(idx, "estimasiJam", e.target.value)}
+                      />
+                    </td>
+                    <td className="border px-1 py-1"><Input className="h-7 text-xs" value={tank.keterangan} onChange={(e) => updateReceivingTank(idx, "keterangan", e.target.value)} placeholder="Roas KPI 0288" /></td>
+                    <td className="border px-1 py-1 text-center"><Button type="button" variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeReceivingTank(idx)}><Trash2 className="h-3 w-3 text-destructive" /></Button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+
+        <Card className="p-6 space-y-4">
           <h2 className="text-lg font-semibold">Tim Serah Terima</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-3">
@@ -797,7 +926,6 @@ export default function EditHandoverPage() {
                 <div className="flex items-center gap-2"><Label className="text-xs w-24">Pws / Danru Shift</Label><Input className="h-8 text-xs" value={teams.yangMenyerahkan.danru} onChange={(e) => setTeams({...teams, yangMenyerahkan: {...teams.yangMenyerahkan, danru: e.target.value}})} /></div>
                 <div className="flex items-center gap-2"><Label className="text-xs w-24">Anggota 1</Label><Input className="h-8 text-xs" value={teams.yangMenyerahkan.anggota1} onChange={(e) => setTeams({...teams, yangMenyerahkan: {...teams.yangMenyerahkan, anggota1: e.target.value}})} /></div>
                 <div className="flex items-center gap-2"><Label className="text-xs w-24">Anggota 2</Label><Input className="h-8 text-xs" value={teams.yangMenyerahkan.anggota2} onChange={(e) => setTeams({...teams, yangMenyerahkan: {...teams.yangMenyerahkan, anggota2: e.target.value}})} /></div>
-                <div className="flex items-center gap-2"><Label className="text-xs w-24">Anggota 3</Label><Input className="h-8 text-xs" value={teams.yangMenyerahkan.anggota3} onChange={(e) => setTeams({...teams, yangMenyerahkan: {...teams.yangMenyerahkan, anggota3: e.target.value}})} /></div>
               </div>
             </div>
             <div className="space-y-3">
@@ -806,7 +934,6 @@ export default function EditHandoverPage() {
                 <div className="flex items-center gap-2"><Label className="text-xs w-24">Pws / Danru Shift</Label><Input className="h-8 text-xs" value={teams.yangMenerima.danru} onChange={(e) => setTeams({...teams, yangMenerima: {...teams.yangMenerima, danru: e.target.value}})} /></div>
                 <div className="flex items-center gap-2"><Label className="text-xs w-24">Anggota 1</Label><Input className="h-8 text-xs" value={teams.yangMenerima.anggota1} onChange={(e) => setTeams({...teams, yangMenerima: {...teams.yangMenerima, anggota1: e.target.value}})} /></div>
                 <div className="flex items-center gap-2"><Label className="text-xs w-24">Anggota 2</Label><Input className="h-8 text-xs" value={teams.yangMenerima.anggota2} onChange={(e) => setTeams({...teams, yangMenerima: {...teams.yangMenerima, anggota2: e.target.value}})} /></div>
-                <div className="flex items-center gap-2"><Label className="text-xs w-24">Anggota 3</Label><Input className="h-8 text-xs" value={teams.yangMenerima.anggota3} onChange={(e) => setTeams({...teams, yangMenerima: {...teams.yangMenerima, anggota3: e.target.value}})} /></div>
               </div>
             </div>
           </div>
@@ -814,7 +941,7 @@ export default function EditHandoverPage() {
             <p className="font-medium text-sm mb-3 text-center">Mengetahui</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex items-center gap-2"><Label className="text-xs w-28 shrink-0">Danru</Label><Input className="h-8 text-xs flex-1" readOnly value={teams.yangMenyerahkan.danru} /></div>
-              <div className="flex items-center gap-2"><Label className="text-xs w-28 shrink-0">Sr. Spv II Fuel & LPG RSD</Label><Input className="h-8 text-xs flex-1" value={teams.mengetahui.spv} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, spv: e.target.value}})} placeholder="Nama" /></div>
+              <div className="flex items-center gap-2"><Label className="text-xs w-28 shrink-0">Spv II Fuel & LPG RS</Label><Input className="h-8 text-xs flex-1" value={teams.mengetahui.spv} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, spv: e.target.value}})} placeholder="Nama" /></div>
             </div>
           </div>
         </Card>
@@ -824,11 +951,12 @@ export default function EditHandoverPage() {
           <Button type="button" variant="outline" onClick={() => handleSave("draft")} disabled={saving}>
             <Save className="h-4 w-4 mr-2" />Simpan Draft
           </Button>
-          <Button type="submit" disabled={saving || !!pendingHandover} title={pendingHandover ? "Tunggu persetujuan supervisor untuk laporan sebelumnya" : undefined}>
-            {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Menyimpan...</> : <><Send className="h-4 w-4 mr-2" />Simpan & Submit</>}
+          <Button type="button" onClick={() => setPreviewMode(true)} disabled={saving || !!pendingHandover} title={pendingHandover ? "Tunggu persetujuan supervisor untuk laporan sebelumnya" : undefined}>
+            <Send className="h-4 w-4 mr-2" />Simpan & Submit
           </Button>
         </div>
       </form>
+      )}
       </ResponsiveScale>
     </div>
   )

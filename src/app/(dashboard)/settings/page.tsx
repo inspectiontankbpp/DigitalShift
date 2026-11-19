@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabContent, TabList, TabTrigger } from "@/components/ui/tabs"
-import { Plus, Edit, Trash2, Save, Loader2, Users, Clock } from "lucide-react"
+import { Plus, Edit, Trash2, Save, Loader2, Users, Clock, Fuel } from "lucide-react"
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -23,6 +23,7 @@ export default function SettingsPage() {
   const toast = useToast()
   const [users, setUsers] = useState<Record<string, unknown>[]>([])
   const [shifts, setShifts] = useState<Record<string, unknown>[]>([])
+  const [tanks, setTanks] = useState<Record<string, unknown>[]>([])
   const [editItem, setEditItem] = useState<Record<string, unknown> | null>(null)
   const [formData, setFormData] = useState<Record<string, unknown>>({})
   const supabase = createClient()
@@ -32,7 +33,10 @@ export default function SettingsPage() {
       const { data } = await supabase.from("profiles").select("*").order("created_at", { ascending: false })
       return data as Record<string, unknown>[] | null
     } else if (type === "shifts") {
-      const { data } = await supabase.from("shifts").select("*").order("start_time")
+      const { data } = await supabase.from("shifts").select("*").order("name")
+      return data as Record<string, unknown>[] | null
+    } else if (type === "tanks") {
+      const { data } = await supabase.from("tank_products").select("*").order("sort_order")
       return data as Record<string, unknown>[] | null
     }
     return null
@@ -41,6 +45,7 @@ export default function SettingsPage() {
   const applyData = (type: string, data: Record<string, unknown>[] | null) => {
     if (type === "users") setUsers(data ?? [])
     else if (type === "shifts") setShifts(data ?? [])
+    else if (type === "tanks") setTanks(data ?? [])
   }
 
   useEffect(() => {
@@ -68,15 +73,27 @@ export default function SettingsPage() {
         return
       }
     }
-    if (type === "shifts" && (!formData.name || !formData.start_time || !formData.end_time)) {
-      toast.error("Semua field shift wajib diisi.")
+    if (type === "shifts" && (!formData.name || String(formData.name).trim() === "")) {
+      toast.error("Nama shift wajib diisi.")
       return
+    }
+    if (type === "tanks") {
+      if (!formData.no_tanki || String(formData.no_tanki).trim() === "") {
+        toast.error("No. tangki wajib diisi.")
+        return
+      }
+      if (!formData.produk || String(formData.produk).trim() === "") {
+        toast.error("Produk wajib diisi.")
+        return
+      }
     }
     setSaving(true)
     try {
-      const table = type === "users" ? "profiles" : type
-      if (editItem?.id) {
-        const { error } = await supabase.from(table).update(formData).eq("id", editItem.id)
+      const table = type === "users" ? "profiles" : type === "tanks" ? "tank_products" : type
+      const keyField = type === "tanks" ? "no_tanki" : "id"
+      const editKey = type === "tanks" ? editItem?.no_tanki : editItem?.id
+      if (editKey) {
+        const { error } = await supabase.from(table).update(formData).eq(keyField, String(editKey))
         if (error) throw error
       } else {
         const { error } = await supabase.from(table).insert(formData)
@@ -94,12 +111,14 @@ export default function SettingsPage() {
   }
 
   const handleDelete = async (type: string, id: string) => {
-    const ok = await confirm("Hapus Data?", `Anda yakin ingin menghapus data ${type} ini?`, { confirmLabel: "Ya, Hapus", variant: "danger" })
+    const label = type === "tanks" ? "tangki" : type
+    const ok = await confirm("Hapus Data?", `Anda yakin ingin menghapus data ${label} ini?`, { confirmLabel: "Ya, Hapus", variant: "danger" })
     if (!ok) return
     setSaving(true)
     try {
-      const table = type === "users" ? "profiles" : type
-      const { error } = await supabase.from(table).delete().eq("id", id)
+      const table = type === "users" ? "profiles" : type === "tanks" ? "tank_products" : type
+      const keyField = type === "tanks" ? "no_tanki" : "id"
+      const { error } = await supabase.from(table).delete().eq(keyField, id)
       if (error) throw error
       applyData(type, await getTableData(type))
       toast.success("Data berhasil dihapus.")
@@ -121,9 +140,10 @@ export default function SettingsPage() {
   const tabs = [
     { id: "users", label: "Users", icon: Users },
     { id: "shifts", label: "Shifts", icon: Clock },
+    { id: "tanks", label: "Tanks", icon: Fuel },
   ]
 
-  const items = { users, shifts }
+  const items = { users, shifts, tanks }
 
   if (authLoading) {
     return <div className="flex items-center justify-center py-12"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>
@@ -137,7 +157,7 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Administration</h1>
-        <p className="text-muted-foreground mt-1">Manage users and shifts</p>
+        <p className="text-muted-foreground mt-1">Manage users, shifts, and tanks</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -162,7 +182,7 @@ export default function SettingsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <CardTitle>{tabs.find((t) => t.id === activeTab)?.label}</CardTitle>
-              <Button size="sm" onClick={() => setEditItem({})}>
+              <Button size="sm" onClick={() => { setEditItem({}); setFormData({}) }}>
                 <Plus className="h-4 w-4 mr-1" />
                 Add
               </Button>
@@ -218,21 +238,45 @@ export default function SettingsPage() {
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                           />
                         </div>
+                      </>
+                    )}
+                    {activeTab === "tanks" && (
+                      <>
                         <div className="space-y-1">
-                          <Label>Start Time</Label>
+                          <Label>No. Tangki</Label>
                           <Input
-                            type="time"
-                            value={String(formData.start_time ?? "")}
-                            onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                            value={String(formData.no_tanki ?? "")}
+                            onChange={(e) => setFormData({ ...formData, no_tanki: e.target.value })}
+                            placeholder="15"
                           />
                         </div>
                         <div className="space-y-1">
-                          <Label>End Time</Label>
+                          <Label>Produk</Label>
                           <Input
-                            type="time"
-                            value={String(formData.end_time ?? "")}
-                            onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
+                            value={String(formData.produk ?? "")}
+                            onChange={(e) => setFormData({ ...formData, produk: e.target.value })}
+                            placeholder="Pertamax"
                           />
+                        </div>
+                        <div className="space-y-1">
+                          <Label>Urutan</Label>
+                          <Input
+                            type="number"
+                            min={0}
+                            value={String(formData.sort_order ?? 0)}
+                            onChange={(e) => setFormData({ ...formData, sort_order: Number(e.target.value) || 0 })}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label>Status</Label>
+                          <select
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            value={String(formData.is_active ?? true)}
+                            onChange={(e) => setFormData({ ...formData, is_active: e.target.value === "true" })}
+                          >
+                            <option value="true">Aktif</option>
+                            <option value="false">Nonaktif</option>
+                          </select>
                         </div>
                       </>
                     )}
@@ -250,37 +294,47 @@ export default function SettingsPage() {
               )}
 
               <div className="space-y-2">
-                {items[activeTab as keyof typeof items].map((item: Record<string, unknown>) => (
-                  <div key={String(item.id)} className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50">
-                    <div>
-                      <p className="font-medium">{String(item.name || item.email || "")}</p>
-                      {item.code ? <p className="text-sm text-muted-foreground">Code: {String(item.code)}</p> : null}
-                      {item.start_time ? (
-                        <p className="text-sm text-muted-foreground">{String(item.start_time)} - {String(item.end_time)}</p>
-                      ) : null}
-                      {item.role ? (
-                        <Badge variant="outline" className="mt-1">{String(item.role)}</Badge>
-                      ) : null}
+                {items[activeTab as keyof typeof items].map((item: Record<string, unknown>) => {
+                  const rowKey = activeTab === "tanks" ? String(item.no_tanki ?? "") : String(item.id ?? "")
+                  const title = activeTab === "tanks"
+                    ? `${String(item.no_tanki ?? "")} — ${String(item.produk ?? "")}`
+                    : String(item.name || item.email || "")
+                  return (
+                    <div key={rowKey} className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50">
+                      <div>
+                        <p className="font-medium">{title}</p>
+                        {activeTab === "tanks" ? (
+                          <p className="text-sm text-muted-foreground">Urutan: {String(item.sort_order ?? 0)}</p>
+                        ) : null}
+                        {item.code ? <p className="text-sm text-muted-foreground">Code: {String(item.code)}</p> : null}
+                        {activeTab === "tanks" ? (
+                          <Badge variant={item.is_active ? "outline" : "secondary"} className="mt-1">
+                            {item.is_active ? "Aktif" : "Nonaktif"}
+                          </Badge>
+                        ) : item.role ? (
+                          <Badge variant="outline" className="mt-1">{String(item.role)}</Badge>
+                        ) : null}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => { setEditItem(item); setFormData(item) }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(activeTab, rowKey)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => { setEditItem(item); setFormData(item) }}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(activeTab, String(item.id))}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </CardContent>
           </Card>

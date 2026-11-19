@@ -178,3 +178,27 @@ relationship TransferRequestFact_nama_produk_DimProduct_transfer
 	fromColumn: TransferRequestFact.nama_produk
 	toColumn: DimProduct.produk
 
+relationship ReceivingTankFact_tanggal_operasional_DimDate
+	fromColumn: ReceivingTankFact.tanggal_operasional
+	toColumn: DimDate.date
+
+relationship ReceivingTankFact_shift_id_DimShift
+	fromColumn: ReceivingTankFact.shift_id
+	toColumn: DimShift.shift_id
+
+relationship ReceivingTankFact_operator_id_DimOperator
+	fromColumn: ReceivingTankFact.operator_id
+	toColumn: DimOperator.operator_id
+
+relationship ReceivingTankFact_regu_shift_DimRegu
+	fromColumn: ReceivingTankFact.regu_shift
+	toColumn: DimRegu.regu_shift
+
+relationship ReceivingTankFact_nama_produk_DimProduct_receiving
+	fromColumn: ReceivingTankFact.nama_produk
+	toColumn: DimProduct.produk
+
+relationship ReceivingTankFact_no_tanki_normalized_DimTank
+	fromColumn: ReceivingTankFact.no_tanki_normalized
+	toColumn: DimTank.no_tanki_key
+

@@ -94,7 +94,7 @@ table ActivityFact
 		mode: directQuery
 		source =
 				let
-				    Source = PostgreSQL.Database("aws-0-ap-northeast-1.pooler.supabase.com:5432", "postgres"),
+				    Source = SupabasePostgres,
 				    Nav = Source{[Schema="reporting",Item="activity_fact"]}[Data]
 				in
 				    Nav

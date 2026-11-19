@@ -9,6 +9,7 @@ import {
   CheckSquare,
   ClipboardList,
   FileText,
+  Fuel,
   Info,
   LayoutDashboard,
   RefreshCw,
@@ -43,8 +44,14 @@ const operatorGuide: GuideContent = {
     {
       title: "Buat handover",
       description:
-        "Buka menu Shift Handover, lalu isi regu, jam shift, level tank, QC, peralatan kritis, safety tools, transfer request, dan aktivitas.",
+        "Buka menu Shift Handover. Pilih regu, isi Jam Shift secara manual, lalu lengkapi level tangki, QC, peralatan kritis, safety tools, transfer request, dan aktivitas.",
       icon: ClipboardList,
+    },
+    {
+      title: "Tambahkan tangki penerimaan",
+      description:
+        "Gunakan bagian Tangki Penerimaan untuk mencatat nomor tangki, produk, estimasi jumlah, dan estimasi jam. Produk terisi otomatis dari master tangki.",
+      icon: Fuel,
     },
     {
       title: "Simpan draft",
@@ -53,9 +60,9 @@ const operatorGuide: GuideContent = {
       icon: Save,
     },
     {
-      title: "Kirim ke supervisor",
+      title: "Periksa pratinjau dan kirim",
       description:
-        "Klik Submit setelah data lengkap. Submit diblokir jika masih ada handover lain yang menunggu review supervisor.",
+        "Klik Submit untuk membuka pratinjau dokumen. Periksa kembali data, lalu kirim. Submit diblokir jika masih ada handover lain yang menunggu review supervisor.",
       icon: Send,
     },
     {
@@ -67,13 +74,14 @@ const operatorGuide: GuideContent = {
     {
       title: "Lihat dan ekspor laporan",
       description:
-        "Menu Reports menampilkan riwayat handover. Gunakan filter tanggal atau status, lalu ekspor ke CSV atau PDF.",
+        "Menu Reports menampilkan riwayat handover. Gunakan filter tanggal atau status, lalu ekspor CSV, cetak PDF ringkasan, atau unduh Berkas berisi PDF lengkap per handover.",
       icon: FileText,
     },
   ],
   tips: [
-    "Lengkapi data operasional sebelum menekan Submit.",
-    "Tombol Edit hanya tersedia untuk handover berstatus Draft atau Reopened.",
+    "Jam Shift diisi manual dan tidak lagi mengikuti master shift.",
+    "Hanya tangki aktif yang muncul di form handover.",
+    "Periksa pratinjau sebelum mengirim laporan.",
     "Handover yang sudah Approved tidak dapat diubah tanpa Reopen dari supervisor.",
   ],
 }
@@ -91,7 +99,7 @@ const supervisorGuide: GuideContent = {
     {
       title: "Review handover",
       description:
-        "Buka menu Approvals, periksa detail laporan, lalu pilih Setujui atau Tolak. Approval membuka izin submit untuk handover berikutnya.",
+        "Buka menu Approvals, periksa detail laporan termasuk jam shift manual dan tangki penerimaan, lalu pilih Setujui atau Tolak. Approval membuka izin submit untuk handover berikutnya.",
       icon: CheckSquare,
     },
     {
@@ -103,26 +111,33 @@ const supervisorGuide: GuideContent = {
     {
       title: "Kelola pengguna dan shift",
       description:
-        "Menu Settings digunakan untuk mengatur pengguna, role, dan shift. Ubah role hanya jika memang diperlukan.",
+        "Menu Settings > Users/Shifts digunakan untuk mengatur pengguna, role, dan nama shift. Jam shift diisi manual di form handover, bukan di master shift.",
       icon: Settings,
+    },
+    {
+      title: "Kelola master tangki",
+      description:
+        "Menu Settings > Tanks digunakan untuk menambah, mengubah, atau menonaktifkan tangki. Hanya tangki aktif yang muncul di form handover.",
+      icon: Fuel,
     },
     {
       title: "Akses Power BI",
       description:
-        "Menu Power BI menyediakan unduhan file ShiftHandover.pbix untuk analisis dan pelaporan lanjutan.",
+        "Menu Power BI menyediakan unduhan ShiftHandover.pbix (4 halaman, termasuk Tangki Penerimaan). Buka di Power BI Desktop lalu Refresh untuk data terbaru.",
       icon: BarChart3,
     },
     {
       title: "Laporan dan ekspor",
       description:
-        "Menu Reports membantu memfilter, mencetak, dan mengekspor data handover sesuai kebutuhan.",
+        "Menu Reports membantu memfilter, mencetak PDF ringkasan, mengekspor CSV, dan mengunduh Berkas PDF lengkap per handover.",
       icon: FileText,
     },
   ],
   tips: [
+    "Hanya tangki aktif yang muncul di form handover.",
+    "Jam shift diisi manual oleh operator per handover.",
     "Approval membuka izin submit untuk handover berikutnya.",
-    "Handover yang sudah Approved tidak dapat dihapus.",
-    "Gunakan Reopen untuk revisi, bukan membuat laporan baru.",
+    "Handover yang sudah Approved tidak dapat dihapus; gunakan Reopen untuk revisi.",
   ],
 }
 
