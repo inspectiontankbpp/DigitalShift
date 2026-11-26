@@ -139,6 +139,7 @@ Form client-side untuk membuat handover baru:
   - Checklist safety tools
   - Permintaan transfer tangki
   - Tim yang menyerahkan/menerima/mengetahui
+  - Bagian Mengetahui (Danru dan SPV) diisi manual dan dapat diubah sesuai petugas yang hadir
   - Log kegiatan
 - Nomor tangki memakai dropdown dari `tank_products`; produk terisi otomatis.
 - Input jam memakai time picker native. Aktivitas dan level tangki baru otomatis terisi jam sekarang.
@@ -448,6 +449,7 @@ Hanya supervisor yang dapat membaca audit trail.
       "anggota3": ""
     },
     "mengetahui": {
+      "danru": "",
       "spv": ""
     }
   }

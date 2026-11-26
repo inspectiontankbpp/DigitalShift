@@ -115,7 +115,7 @@ export default function HandoverFormPage() {
   const [teams, setTeams] = useState<HandoverTeams>({
     yangMenyerahkan: { danru: profile?.full_name || "", anggota1: "", anggota2: "" },
     yangMenerima: { danru: "", anggota1: "", anggota2: "" },
-    mengetahui: { spv: "" }
+    mengetahui: { danru: profile?.full_name || "", spv: "" }
   })
 
   const [activities, setActivities] = useState<Activity[]>([])
@@ -1129,7 +1129,7 @@ export default function HandoverFormPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                 <Label className="text-xs sm:w-28 shrink-0">Danru</Label>
-                <Input className="h-8 text-xs flex-1" readOnly value={teams.yangMenyerahkan.danru} />
+                <Input className="h-8 text-xs flex-1" value={teams.mengetahui.danru} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, danru: e.target.value}})} placeholder="Nama" />
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                 <Label className="text-xs sm:w-28 shrink-0">Spv II Fuel & LPG RS</Label>

@@ -102,6 +102,7 @@ export interface HandoverTeams {
     anggota2: string
   }
   mengetahui: {
+    danru: string
     spv: string
   }
 }

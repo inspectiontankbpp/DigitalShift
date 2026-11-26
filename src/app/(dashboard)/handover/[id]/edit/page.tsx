@@ -82,7 +82,7 @@ export default function EditHandoverPage() {
   const [teams, setTeams] = useState<HandoverTeams>({
     yangMenyerahkan: { danru: "", anggota1: "", anggota2: "" },
     yangMenerima: { danru: "", anggota1: "", anggota2: "" },
-    mengetahui: { spv: "" }
+    mengetahui: { danru: "", spv: "" }
   })
   const [activities, setActivities] = useState<Activity[]>([])
   const [pendingHandover, setPendingHandover] = useState<{ id: string; form_number: string; status: string } | null>(null)
@@ -168,7 +168,15 @@ export default function EditHandoverPage() {
           }))
         )
       }
-      if (op.teams) setTeams(op.teams)
+      if (op.teams) {
+        setTeams({
+          ...op.teams,
+          mengetahui: {
+            danru: op.teams.mengetahui?.danru || op.teams.yangMenyerahkan?.danru || "",
+            spv: op.teams.mengetahui?.spv || "",
+          },
+        })
+      }
 
       // Fallback: if no shift_id stored, match by shift name
       if (!handoverData.shift_id && op.reguShift && shiftsData?.length) {
@@ -943,7 +951,7 @@ export default function EditHandoverPage() {
           <div className="border-t pt-3 mt-3">
             <p className="font-medium text-sm mb-3 text-center">Mengetahui</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="flex items-center gap-2"><Label className="text-xs w-28 shrink-0">Danru</Label><Input className="h-8 text-xs flex-1" readOnly value={teams.yangMenyerahkan.danru} /></div>
+              <div className="flex items-center gap-2"><Label className="text-xs w-28 shrink-0">Danru</Label><Input className="h-8 text-xs flex-1" value={teams.mengetahui.danru} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, danru: e.target.value}})} placeholder="Nama" /></div>
               <div className="flex items-center gap-2"><Label className="text-xs w-28 shrink-0">Spv II Fuel & LPG RS</Label><Input className="h-8 text-xs flex-1" value={teams.mengetahui.spv} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, spv: e.target.value}})} placeholder="Nama" /></div>
             </div>
           </div>

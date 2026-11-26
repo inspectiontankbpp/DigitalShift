@@ -127,7 +127,7 @@ export async function renderHandoverPdf(
   const teams = op.teams || {
     yangMenyerahkan: { danru: handover.profiles?.full_name || "", anggota1: "", anggota2: "" },
     yangMenerima: { danru: "", anggota1: "", anggota2: "" },
-    mengetahui: { spv: "" },
+    mengetahui: { danru: handover.profiles?.full_name || "", spv: "" },
   }
 
   const newPage = () => {
@@ -653,7 +653,7 @@ export async function renderHandoverPdf(
   doc.line(MARGIN + half + 10, boxTop + 40.5, MARGIN + CONTENT_WIDTH - 10, boxTop + 40.5)
 
   setFont(true)
-  doc.text(teams.yangMenyerahkan?.danru || "-", MARGIN + half / 2, boxTop + 53, { align: "center" })
+  doc.text(teams.mengetahui?.danru || teams.yangMenyerahkan?.danru || "-", MARGIN + half / 2, boxTop + 53, { align: "center" })
   doc.text(teams.mengetahui?.spv || "", MARGIN + half + half / 2, boxTop + 53, { align: "center" })
   y = boxTop + signatureHeight + 2
 

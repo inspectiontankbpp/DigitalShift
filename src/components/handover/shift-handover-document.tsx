@@ -60,7 +60,7 @@ export function ShiftHandoverDocument({ handover, activities = [] }: ShiftHandov
   const teams = opData.teams || {
     yangMenyerahkan: { danru: handover.profiles?.full_name || "", anggota1: "", anggota2: "" },
     yangMenerima: { danru: "", anggota1: "", anggota2: "" },
-    mengetahui: { spv: "" }
+    mengetahui: { danru: handover.profiles?.full_name || "", spv: "" }
   }
 
   const criticalPenerimaan = criticalEq.filter(item => item.kategori === "Penerimaan")
@@ -440,7 +440,7 @@ export function ShiftHandoverDocument({ handover, activities = [] }: ShiftHandov
             <div>
               <div className="font-medium border-b border-black pb-1 mb-2">Danru</div>
               <div className="h-12"></div>
-              <p className="font-bold">{teams.yangMenyerahkan?.danru || "-"}</p>
+              <p className="font-bold">{teams.mengetahui?.danru || teams.yangMenyerahkan?.danru || "-"}</p>
             </div>
             <div>
               <div className="font-medium border-b border-black pb-1 mb-2">Sr. Spv II Fuel & LPG RSD</div>
