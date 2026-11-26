@@ -166,6 +166,7 @@ Submit diblokir jika masih ada handover lain dengan status `submitted`, `rejecte
 
 - Create form: mengambil handover terbaru berdasarkan `created_at` tanpa filter operator.
 - Edit form: query sama, tetapi mengecualikan handover yang sedang diedit.
+- Supervisor dapat submit ulang handover berstatus `submitted` atau `reopened` yang sedang diedit tanpa terblokir gate.
 - Draft selalu boleh disimpan.
 - Gate ini hanya validasi UI, bukan constraint database.
 

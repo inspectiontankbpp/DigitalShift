@@ -174,6 +174,7 @@ Aturan bisnis:
 - Operator hanya dapat mengedit handover `draft` atau `reopened` miliknya.
 - Handover `submitted`, `approved`, atau `rejected` harus di-reopen supervisor sebelum diedit.
 - Form pembuatan handover memblokir submit jika masih ada handover aktif berstatus `submitted`, `rejected`, atau `reopened`.
+- Supervisor dapat submit ulang handover `submitted`/`reopened` yang sedang diedit tanpa terblokir gate.
 - Submit gate adalah validasi UI, bukan constraint database.
 - Approve/reject menulis baris ke `approvals` dan mengisi `approved_at`.
 - Reopen mengisi `reopened_at`.

@@ -89,6 +89,8 @@ export default function EditHandoverPage() {
   const [handoverStatus, setHandoverStatus] = useState("")
   const [previewMode, setPreviewMode] = useState(false)
   const savingRef = useRef(false)
+  const isSupervisorResubmit = profile?.role === "supervisor" && ["submitted", "reopened"].includes(handoverStatus)
+  const submitBlocked = !!pendingHandover && !isSupervisorResubmit
 
   useEffect(() => {
     async function fetchData() {
@@ -234,7 +236,7 @@ export default function EditHandoverPage() {
       toast.error("Handover ini hanya dapat diedit setelah dibuka kembali supervisor.")
       return
     }
-    if (status === "submitted") {
+    if (status === "submitted" && !isSupervisorResubmit) {
       const { data: latestData } = await supabase
         .from("handovers")
         .select("id, form_number, status")
@@ -488,7 +490,7 @@ export default function EditHandoverPage() {
         </div>
       </div>
 
-      {pendingHandover && (
+      {submitBlocked && (
         <div className="flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
           <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
           <p className="space-y-1">
@@ -514,7 +516,7 @@ export default function EditHandoverPage() {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Edit
             </Button>
-            <Button type="button" onClick={() => handleSave("submitted")} disabled={saving || !!pendingHandover} className="w-full sm:w-auto">
+            <Button type="button" onClick={() => handleSave("submitted")} disabled={saving || submitBlocked} className="w-full sm:w-auto">
               {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Menyimpan...</> : <><Send className="h-4 w-4 mr-2" />Simpan & Submit</>}
             </Button>
           </div>
@@ -952,7 +954,7 @@ export default function EditHandoverPage() {
           <Button type="button" variant="outline" onClick={() => handleSave("draft")} disabled={saving}>
             <Save className="h-4 w-4 mr-2" />Simpan Draft
           </Button>
-          <Button type="button" onClick={() => setPreviewMode(true)} disabled={saving || !!pendingHandover} title={pendingHandover ? "Tunggu persetujuan supervisor untuk laporan sebelumnya" : undefined}>
+          <Button type="button" onClick={() => setPreviewMode(true)} disabled={saving || submitBlocked} title={submitBlocked ? "Tunggu persetujuan supervisor untuk laporan sebelumnya" : undefined}>
             <Send className="h-4 w-4 mr-2" />Simpan & Submit
           </Button>
         </div>
