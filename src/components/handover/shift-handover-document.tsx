@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { OperationalData } from "@/lib/handover-types"
+import { DEFAULT_MENGETAHUI_JABATAN, OperationalData } from "@/lib/handover-types"
 
 function formatTimeDisplay(value: unknown): string {
   const text = String(value ?? "").trim()
@@ -60,7 +60,12 @@ export function ShiftHandoverDocument({ handover, activities = [] }: ShiftHandov
   const teams = opData.teams || {
     yangMenyerahkan: { danru: handover.profiles?.full_name || "", anggota1: "", anggota2: "" },
     yangMenerima: { danru: "", anggota1: "", anggota2: "" },
-    mengetahui: { danru: handover.profiles?.full_name || "", spv: "" }
+    mengetahui: {
+      danru: handover.profiles?.full_name || "",
+      danruJabatan: DEFAULT_MENGETAHUI_JABATAN.danru,
+      spv: "",
+      spvJabatan: DEFAULT_MENGETAHUI_JABATAN.spv,
+    }
   }
 
   const criticalPenerimaan = criticalEq.filter(item => item.kategori === "Penerimaan")
@@ -438,12 +443,12 @@ export function ShiftHandoverDocument({ handover, activities = [] }: ShiftHandov
           <div className="font-bold border-b border-black pb-1 mb-2 text-center bg-gray-100">Mengetahui</div>
           <div className="grid grid-cols-2 gap-4 text-center">
             <div>
-              <div className="font-medium border-b border-black pb-1 mb-2">Danru</div>
+              <div className="font-medium border-b border-black pb-1 mb-2">{teams.mengetahui?.danruJabatan || DEFAULT_MENGETAHUI_JABATAN.danru}</div>
               <div className="h-12"></div>
               <p className="font-bold">{teams.mengetahui?.danru || teams.yangMenyerahkan?.danru || "-"}</p>
             </div>
             <div>
-              <div className="font-medium border-b border-black pb-1 mb-2">Sr. Spv II Fuel & LPG RSD</div>
+              <div className="font-medium border-b border-black pb-1 mb-2">{teams.mengetahui?.spvJabatan || DEFAULT_MENGETAHUI_JABATAN.spv}</div>
               <div className="h-12"></div>
               <p className="font-bold">{teams.mengetahui?.spv || ""}</p>
             </div>

@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf"
-import type { OperationalData } from "@/lib/handover-types"
+import { DEFAULT_MENGETAHUI_JABATAN, type OperationalData } from "@/lib/handover-types"
 import { parseDateValue } from "@/lib/format"
 
 interface PdfHandover {
@@ -127,7 +127,12 @@ export async function renderHandoverPdf(
   const teams = op.teams || {
     yangMenyerahkan: { danru: handover.profiles?.full_name || "", anggota1: "", anggota2: "" },
     yangMenerima: { danru: "", anggota1: "", anggota2: "" },
-    mengetahui: { danru: handover.profiles?.full_name || "", spv: "" },
+    mengetahui: {
+      danru: handover.profiles?.full_name || "",
+      danruJabatan: DEFAULT_MENGETAHUI_JABATAN.danru,
+      spv: "",
+      spvJabatan: DEFAULT_MENGETAHUI_JABATAN.spv,
+    },
   }
 
   const newPage = () => {
@@ -647,8 +652,8 @@ export async function renderHandoverPdf(
   doc.text("Mengetahui", PAGE_WIDTH / 2, boxTop + 30.6, { align: "center" })
 
   setFont(false)
-  doc.text("Danru", MARGIN + half / 2, boxTop + 38.5, { align: "center" })
-  doc.text("Sr. Spv II Fuel & LPG RSD", MARGIN + half + half / 2, boxTop + 38.5, { align: "center" })
+  doc.text(teams.mengetahui?.danruJabatan || DEFAULT_MENGETAHUI_JABATAN.danru, MARGIN + half / 2, boxTop + 38.5, { align: "center", maxWidth: half - 20 })
+  doc.text(teams.mengetahui?.spvJabatan || DEFAULT_MENGETAHUI_JABATAN.spv, MARGIN + half + half / 2, boxTop + 38.5, { align: "center", maxWidth: half - 20 })
   doc.line(MARGIN + 10, boxTop + 40.5, MARGIN + half - 10, boxTop + 40.5)
   doc.line(MARGIN + half + 10, boxTop + 40.5, MARGIN + CONTENT_WIDTH - 10, boxTop + 40.5)
 

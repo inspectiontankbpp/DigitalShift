@@ -21,6 +21,7 @@ import { getLocalDateKey } from "@/lib/format"
 import { useToast } from "@/contexts/toast-context"
 import { useUser } from "@/contexts/user-context"
 import {
+  DEFAULT_MENGETAHUI_JABATAN,
   DEFAULT_SAFETY_TOOLS,
   DEFAULT_CRITICAL_EQUIPMENT,
   getCurrentTimeValue,
@@ -82,7 +83,12 @@ export default function EditHandoverPage() {
   const [teams, setTeams] = useState<HandoverTeams>({
     yangMenyerahkan: { danru: "", anggota1: "", anggota2: "" },
     yangMenerima: { danru: "", anggota1: "", anggota2: "" },
-    mengetahui: { danru: "", spv: "" }
+    mengetahui: {
+      danru: "",
+      danruJabatan: DEFAULT_MENGETAHUI_JABATAN.danru,
+      spv: "",
+      spvJabatan: DEFAULT_MENGETAHUI_JABATAN.spv,
+    }
   })
   const [activities, setActivities] = useState<Activity[]>([])
   const [pendingHandover, setPendingHandover] = useState<{ id: string; form_number: string; status: string } | null>(null)
@@ -173,7 +179,9 @@ export default function EditHandoverPage() {
           ...op.teams,
           mengetahui: {
             danru: op.teams.mengetahui?.danru || op.teams.yangMenyerahkan?.danru || "",
+            danruJabatan: op.teams.mengetahui?.danruJabatan || DEFAULT_MENGETAHUI_JABATAN.danru,
             spv: op.teams.mengetahui?.spv || "",
+            spvJabatan: op.teams.mengetahui?.spvJabatan || DEFAULT_MENGETAHUI_JABATAN.spv,
           },
         })
       }
@@ -951,8 +959,14 @@ export default function EditHandoverPage() {
           <div className="border-t pt-3 mt-3">
             <p className="font-medium text-sm mb-3 text-center">Mengetahui</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="flex items-center gap-2"><Label className="text-xs w-28 shrink-0">Danru</Label><Input className="h-8 text-xs flex-1" value={teams.mengetahui.danru} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, danru: e.target.value}})} placeholder="Nama" /></div>
-              <div className="flex items-center gap-2"><Label className="text-xs w-28 shrink-0">Spv II Fuel & LPG RS</Label><Input className="h-8 text-xs flex-1" value={teams.mengetahui.spv} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, spv: e.target.value}})} placeholder="Nama" /></div>
+              <div className="space-y-1">
+                <Input aria-label="Jabatan Danru" className="h-8 text-xs font-medium" value={teams.mengetahui.danruJabatan} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, danruJabatan: e.target.value}})} placeholder="Jabatan Danru" />
+                <Input className="h-8 text-xs" value={teams.mengetahui.danru} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, danru: e.target.value}})} placeholder="Nama Danru" />
+              </div>
+              <div className="space-y-1">
+                <Input aria-label="Jabatan SPV" className="h-8 text-xs font-medium" value={teams.mengetahui.spvJabatan} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, spvJabatan: e.target.value}})} placeholder="Jabatan SPV" />
+                <Input className="h-8 text-xs" value={teams.mengetahui.spv} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, spv: e.target.value}})} placeholder="Nama SPV" />
+              </div>
             </div>
           </div>
         </Card>

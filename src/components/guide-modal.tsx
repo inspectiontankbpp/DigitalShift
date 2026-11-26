@@ -81,7 +81,7 @@ const operatorGuide: GuideContent = {
   tips: [
     "Jam Shift diisi manual dan tidak lagi mengikuti master shift.",
     "Hanya tangki aktif yang muncul di form handover.",
-    "Bagian Mengetahui (Danru dan SPV) diisi manual sesuai petugas yang hadir.",
+    "Jabatan dan nama bagian Mengetahui (Danru/SPV) diisi manual sesuai petugas yang hadir.",
     "Periksa pratinjau sebelum mengirim laporan.",
     "Handover yang sudah Approved tidak dapat diubah tanpa Reopen dari supervisor.",
   ],
@@ -137,7 +137,7 @@ const supervisorGuide: GuideContent = {
   tips: [
     "Hanya tangki aktif yang muncul di form handover.",
     "Jam shift diisi manual oleh operator per handover.",
-    "Bagian Mengetahui (Danru dan SPV) diisi manual sesuai petugas yang hadir.",
+    "Jabatan dan nama bagian Mengetahui (Danru/SPV) diisi manual sesuai petugas yang hadir.",
     "Approval membuka izin submit untuk handover berikutnya.",
     "Handover yang sudah Approved tidak dapat dihapus; gunakan Reopen untuk revisi.",
   ],

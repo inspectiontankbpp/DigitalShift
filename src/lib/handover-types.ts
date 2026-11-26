@@ -90,6 +90,11 @@ export interface ReceivingTank {
   keterangan: string
 }
 
+export const DEFAULT_MENGETAHUI_JABATAN = {
+  danru: "Danru",
+  spv: "Sr. Spv II Fuel & LPG RSD",
+}
+
 export interface HandoverTeams {
   yangMenyerahkan: {
     danru: string
@@ -103,7 +108,9 @@ export interface HandoverTeams {
   }
   mengetahui: {
     danru: string
+    danruJabatan: string
     spv: string
+    spvJabatan: string
   }
 }
 

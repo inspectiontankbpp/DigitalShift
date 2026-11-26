@@ -22,6 +22,7 @@ import { ResponsiveScale } from "@/components/responsive-scale"
 import { ShiftHandoverDocument } from "@/components/handover/shift-handover-document"
 import { getLocalDateKey } from "@/lib/format"
 import {
+  DEFAULT_MENGETAHUI_JABATAN,
   DEFAULT_SAFETY_TOOLS,
   DEFAULT_CRITICAL_EQUIPMENT,
   getCurrentTimeValue,
@@ -115,7 +116,12 @@ export default function HandoverFormPage() {
   const [teams, setTeams] = useState<HandoverTeams>({
     yangMenyerahkan: { danru: profile?.full_name || "", anggota1: "", anggota2: "" },
     yangMenerima: { danru: "", anggota1: "", anggota2: "" },
-    mengetahui: { danru: profile?.full_name || "", spv: "" }
+    mengetahui: {
+      danru: profile?.full_name || "",
+      danruJabatan: DEFAULT_MENGETAHUI_JABATAN.danru,
+      spv: "",
+      spvJabatan: DEFAULT_MENGETAHUI_JABATAN.spv,
+    }
   })
 
   const [activities, setActivities] = useState<Activity[]>([])
@@ -1127,13 +1133,13 @@ export default function HandoverFormPage() {
           <div className="border-t pt-3 mt-3">
             <p className="font-medium text-sm mb-3 text-center">Mengetahui</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                <Label className="text-xs sm:w-28 shrink-0">Danru</Label>
-                <Input className="h-8 text-xs flex-1" value={teams.mengetahui.danru} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, danru: e.target.value}})} placeholder="Nama" />
+              <div className="space-y-1">
+                <Input aria-label="Jabatan Danru" className="h-8 text-xs font-medium" value={teams.mengetahui.danruJabatan} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, danruJabatan: e.target.value}})} placeholder="Jabatan Danru" />
+                <Input className="h-8 text-xs" value={teams.mengetahui.danru} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, danru: e.target.value}})} placeholder="Nama Danru" />
               </div>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                <Label className="text-xs sm:w-28 shrink-0">Spv II Fuel & LPG RS</Label>
-                <Input className="h-8 text-xs flex-1" value={teams.mengetahui.spv} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, spv: e.target.value}})} placeholder="Nama" />
+              <div className="space-y-1">
+                <Input aria-label="Jabatan SPV" className="h-8 text-xs font-medium" value={teams.mengetahui.spvJabatan} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, spvJabatan: e.target.value}})} placeholder="Jabatan SPV" />
+                <Input className="h-8 text-xs" value={teams.mengetahui.spv} onChange={(e) => setTeams({...teams, mengetahui: {...teams.mengetahui, spv: e.target.value}})} placeholder="Nama SPV" />
               </div>
             </div>
           </div>
