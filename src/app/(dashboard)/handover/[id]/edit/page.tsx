@@ -17,6 +17,7 @@ import {
 import { Plus, Trash2, Save, Send, Loader2, ArrowLeft, CheckSquare, Layers, AlertCircle, Eye } from "lucide-react"
 import { ResponsiveScale } from "@/components/responsive-scale"
 import { ShiftHandoverDocument } from "@/components/handover/shift-handover-document"
+import { getLocalDateKey } from "@/lib/format"
 import { useToast } from "@/contexts/toast-context"
 import { useUser } from "@/contexts/user-context"
 import {
@@ -65,7 +66,7 @@ export default function EditHandoverPage() {
   const [saving, setSaving] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
-  const [tanggal, setTanggal] = useState(new Date().toISOString().split("T")[0])
+  const [tanggal, setTanggal] = useState(getLocalDateKey())
   const [reguShift, setReguShift] = useState("Sore")
   const [jamShift, setJamShift] = useState("")
   const [selectedShift, setSelectedShift] = useState("")

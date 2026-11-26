@@ -20,6 +20,7 @@ import {
 import { Plus, Trash2, Save, Send, Loader2, CheckSquare, Layers, AlertCircle, Eye, ArrowLeft } from "lucide-react"
 import { ResponsiveScale } from "@/components/responsive-scale"
 import { ShiftHandoverDocument } from "@/components/handover/shift-handover-document"
+import { getLocalDateKey } from "@/lib/format"
 import {
   DEFAULT_SAFETY_TOOLS,
   DEFAULT_CRITICAL_EQUIPMENT,
@@ -63,11 +64,39 @@ export default function HandoverFormPage() {
 
   const [selectedShift, setSelectedShift] = useState("")
   const [shiftOptions, setShiftOptions] = useState<ShiftOption[]>([])
-  const [tanggal] = useState(new Date().toISOString().split("T")[0])
+  const [tanggal, setTanggal] = useState(getLocalDateKey())
   const [kondisiOperasional] = useState("normal")
   const [submitting, setSubmitting] = useState(false)
   const [pendingHandover, setPendingHandover] = useState<{ id: string; form_number: string; status: string } | null>(null)
   const submittingRef = useRef(false)
+
+  useEffect(() => {
+    let timeoutId: number
+
+    const scheduleNextDateChange = () => {
+      const now = new Date()
+      const next = new Date(now)
+      next.setHours(24, 1, 0, 0)
+      timeoutId = window.setTimeout(() => {
+        setTanggal(getLocalDateKey())
+        scheduleNextDateChange()
+      }, next.getTime() - now.getTime())
+    }
+
+    const syncDate = () => {
+      if (document.visibilityState === "visible") setTanggal(getLocalDateKey())
+    }
+
+    scheduleNextDateChange()
+    document.addEventListener("visibilitychange", syncDate)
+    window.addEventListener("focus", syncDate)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+      document.removeEventListener("visibilitychange", syncDate)
+      window.removeEventListener("focus", syncDate)
+    }
+  }, [])
 
   const [reguShift, setReguShift] = useState("Sore")
   const [jamShift, setJamShift] = useState("")
@@ -286,9 +315,8 @@ export default function HandoverFormPage() {
     setReguShift(shift.name)
   }
 
-  const generateFormNumber = () => {
-    const date = new Date()
-    const yyyymmdd = date.toISOString().slice(0, 10).replace(/-/g, "")
+  const generateFormNumber = (dateKey = getLocalDateKey()) => {
+    const yyyymmdd = dateKey.replace(/-/g, "")
     const random = Math.floor(Math.random() * 1000).toString().padStart(3, "0")
     return `SH-${yyyymmdd}-${random}`
   }
@@ -313,7 +341,9 @@ export default function HandoverFormPage() {
     setSubmitting(true)
 
     try {
-      const formNumber = generateFormNumber()
+      const currentTanggal = getLocalDateKey()
+      setTanggal(currentTanggal)
+      const formNumber = generateFormNumber(currentTanggal)
       const operationalData: OperationalData = {
         reguShift,
         shiftName: reguShift,
@@ -331,7 +361,7 @@ export default function HandoverFormPage() {
         .from("handovers")
         .insert({
           form_number: formNumber,
-          tanggal,
+          tanggal: currentTanggal,
           shift_id: selectedShift,
           operator_id: user.id,
           kondisi_operasional: kondisiOperasional,
